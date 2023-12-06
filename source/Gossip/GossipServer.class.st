@@ -1,34 +1,51 @@
 Class {
-	#name : #GossipReceiver,
+	#name : #GossipServer,
 	#superclass : #Object,
 	#instVars : [
 		'loop',
 		'process',
 		'socket',
-		'messageHandler'
+		'messageHandler',
+		'port',
+		'gossiper'
+	],
+	#classInstVars : [
+		'instance'
 	],
 	#category : #Gossip
 }
 
+{ #category : #accessing }
+GossipServer class >> instance [ 
+	^ instance ifNil: [ 
+		instance := self new ]
+]
+
+{ #category : #accessing }
+GossipServer >> defaultPort [ 
+	^ 1999
+]
+
+{ #category : #accessing }
+GossipServer >> gossiper: anObject [
+
+	gossiper := anObject
+]
+
 { #category : #initialization }
-GossipReceiver >> initialize [ 
+GossipServer >> initialize [ 
 	super initialize.
 	loop := true.
 ]
 
 { #category : #accessing }
-GossipReceiver >> messageHandler: anObject [
-
-	messageHandler := anObject
-]
-
-{ #category : #accessing }
-GossipReceiver >> port [ 
-	^ 1999
+GossipServer >> port [ 
+	^ port ifNil: [ 
+		port := self defaultPort ]
 ]
 
 { #category : #running }
-GossipReceiver >> run [ 
+GossipServer >> run [ 
 	socket := Socket newUDP 
 		setPort: self port; 
 		yourself.
@@ -38,16 +55,15 @@ GossipReceiver >> run [
 ]
 
 { #category : #running }
-GossipReceiver >> runLoop [ 
+GossipServer >> runLoop [ 
 	| buffer result |
 	[ [ loop ] whileTrue: [
 		buffer := String new: 256.
 		socket waitForData.
 		result := socket receiveUDPDataInto: buffer.
-		messageHandler 
-			value: (buffer copyFrom: 1 to: result first)
-			value: result second 
-			value: result third.
+		gossiper 
+			received:  (buffer copyFrom: 1 to: result first)
+			from: (Endpoint fromUDP: result)
 	 ] ]
 		ensure: [ 
 			Transcript show: 'closing socket on port ', self port printString; cr.
@@ -55,6 +71,6 @@ GossipReceiver >> runLoop [
 ]
 
 { #category : #accessing }
-GossipReceiver >> stop [ 
+GossipServer >> stop [ 
 	process terminate
 ]
