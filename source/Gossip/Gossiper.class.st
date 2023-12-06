@@ -18,10 +18,22 @@ Gossiper class >> instance [
 		instance := self new ]
 ]
 
+{ #category : #accessing }
+Gossiper >> endpointAt: key [
+	^  endpointStates 
+		at: key 
+		ifAbsentPut: [ GossipEndpointState new ]
+]
+
 { #category : #initialization }
 Gossiper >> initialize [ 
 	super initialize.
 	endpointStates := Dictionary new
+]
+
+{ #category : #accessing }
+Gossiper >> myEndpoint [
+	^ self endpointAt: GossipEndpoint me
 ]
 
 { #category : #accessing }
@@ -65,13 +77,14 @@ Gossiper >> start [
 ]
 
 { #category : #accessing }
+Gossiper >> stateAt: aString [ 
+	^ (self myEndpoint stateAt: aString) value
+]
+
+{ #category : #accessing }
 Gossiper >> stateAt: key put: value [
-	| ep valueHolder |
-	ep := endpointStates 
-		at: Endpoint me 
-		ifAbsentPut: [ 
-			EndpointStateMap new ].
-	valueHolder := ep 
+	| valueHolder |
+	valueHolder := self myEndpoint 
 		stateAt: key
 		ifAbsentPut: [ GossipVersionedValue new ].
 	valueHolder setValue: value

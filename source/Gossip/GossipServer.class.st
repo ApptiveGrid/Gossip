@@ -68,7 +68,7 @@ GossipServer >> runLoop [
 		result := socket receiveUDPDataInto: buffer.
 		gossiper 
 			received:  (buffer copyFrom: 1 to: result first)
-			from: (Endpoint fromUDP: result)
+			from: (GossipEndpoint fromUDP: result)
 	 ] ]
 		ensure: [ 
 			Transcript show: 'closing socket on port ', self port printString; cr.

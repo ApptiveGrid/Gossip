@@ -1,5 +1,5 @@
 Class {
-	#name : #Endpoint,
+	#name : #GossipEndpoint,
 	#superclass : #Object,
 	#instVars : [
 		'address',
@@ -9,55 +9,55 @@ Class {
 }
 
 { #category : #'instance creation' }
-Endpoint class >> fromUDP: result [ 
+GossipEndpoint class >> fromUDP: result [ 
 	^ self new 
 		address: result second;
 		port: result third
 ]
 
 { #category : #services }
-Endpoint class >> me [
+GossipEndpoint class >> me [
 	^ self new 
 		address: #[ 0 0 0 0 ];
 		port: 0
 ]
 
 { #category : #comparing }
-Endpoint >> = anEndpoint [ 
+GossipEndpoint >> = anEndpoint [ 
 	^ (anEndpoint address = address) and: [ 
 		anEndpoint port = port ] 
 ]
 
 { #category : #accessing }
-Endpoint >> address [
+GossipEndpoint >> address [
 
 	^ address
 ]
 
 { #category : #accessing }
-Endpoint >> address: anObject [
+GossipEndpoint >> address: anObject [
 
 	address := anObject
 ]
 
 { #category : #comparing }
-Endpoint >> hash [
+GossipEndpoint >> hash [
 	^ address hash bitXor: port hash
 ]
 
 { #category : #accessing }
-Endpoint >> port [
+GossipEndpoint >> port [
 
 	^ port
 ]
 
 { #category : #accessing }
-Endpoint >> port: anObject [
+GossipEndpoint >> port: anObject [
 
 	port := anObject
 ]
 
 { #category : #printing }
-Endpoint >> printOn: aStream [ 
+GossipEndpoint >> printOn: aStream [ 
 	aStream << ($. join: (address collect: #asString as: Array)) << ':' << port printString
 ]
