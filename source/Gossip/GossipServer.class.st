@@ -44,6 +44,11 @@ GossipServer >> port [
 		port := self defaultPort ]
 ]
 
+{ #category : #accessing }
+GossipServer >> port: anInteger [ 
+	port := anInteger
+]
+
 { #category : #running }
 GossipServer >> run [ 
 	socket := Socket newUDP 
@@ -72,5 +77,6 @@ GossipServer >> runLoop [
 
 { #category : #accessing }
 GossipServer >> stop [ 
-	process terminate
+	process terminate.
+	socket closeAndDestroy 
 ]

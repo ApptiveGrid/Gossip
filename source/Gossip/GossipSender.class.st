@@ -38,3 +38,8 @@ GossipSender >> sendMessage: aMessage toAdress: address port: port [
 		port: port 
 	
 ]
+
+{ #category : #accessing }
+GossipSender >> stop [
+	socket closeAndDestroy 
+]

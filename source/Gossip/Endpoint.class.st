@@ -15,6 +15,13 @@ Endpoint class >> fromUDP: result [
 		port: result third
 ]
 
+{ #category : #services }
+Endpoint class >> me [
+	^ self new 
+		address: #[ 0 0 0 0 ];
+		port: 0
+]
+
 { #category : #comparing }
 Endpoint >> = anEndpoint [ 
 	^ (anEndpoint address = address) and: [ 

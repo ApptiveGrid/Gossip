@@ -2,7 +2,9 @@ Class {
 	#name : #Gossiper,
 	#superclass : #Object,
 	#instVars : [
-		'server'
+		'server',
+		'sender',
+		'endpointStates'
 	],
 	#classInstVars : [
 		'instance'
@@ -16,6 +18,17 @@ Gossiper class >> instance [
 		instance := self new ]
 ]
 
+{ #category : #initialization }
+Gossiper >> initialize [ 
+	super initialize.
+	endpointStates := Dictionary new
+]
+
+{ #category : #accessing }
+Gossiper >> port: anInteger [ 
+	self server port: anInteger 
+]
+
 { #category : #'as yet unclassified' }
 Gossiper >> received: aString from: endpoint [
 	| message |
@@ -25,17 +38,50 @@ Gossiper >> received: aString from: endpoint [
 
 { #category : #'utilities - objectiveC' }
 Gossiper >> sendMessage: aGossipSimpleMessage toAdress: aCollection port: anInteger [ 
-	self shouldBeImplemented.
+	self sender 
+		sendMessage: aGossipSimpleMessage 
+		toAdress: aCollection 
+		port: anInteger 
+]
+
+{ #category : #accessing }
+Gossiper >> sender [
+	^ sender ifNil: [ 
+		sender := GossipSender new  ]
+]
+
+{ #category : #accessing }
+Gossiper >> server [ 
+	^ server ifNil: [
+		server := GossipServer new 
+			gossiper: self;
+			yourself ]
 ]
 
 { #category : #accessing }
 Gossiper >> start [ 
-	server := GossipServer new 
-		gossiper: self;
-		run
+	self server run
+
+]
+
+{ #category : #accessing }
+Gossiper >> stateAt: key put: value [
+	| ep valueHolder |
+	ep := endpointStates 
+		at: Endpoint me 
+		ifAbsentPut: [ 
+			EndpointStateMap new ].
+	valueHolder := ep 
+		stateAt: key
+		ifAbsentPut: [ GossipVersionedValue new ].
+	valueHolder setValue: value
+	
 ]
 
 { #category : #accessing }
 Gossiper >> stop [
-	server stop
+	server ifNotNil: [  
+		server stop ].
+	sender ifNotNil: [ 
+		sender stop ]
 ]
