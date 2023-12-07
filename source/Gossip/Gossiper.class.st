@@ -43,9 +43,15 @@ Gossiper >> port: anInteger [
 
 { #category : #'as yet unclassified' }
 Gossiper >> received: aString from: endpoint [
-	| message |
-	message := STON fromString: aString.
-	message processIn: self for: endpoint
+	self 
+		receivedMessage: (STON fromString: aString) 
+		from: endpoint.
+
+]
+
+{ #category : #'as yet unclassified' }
+Gossiper >> receivedMessage: aMessage from: endpoint [
+	aMessage processIn: self for: endpoint
 ]
 
 { #category : #'utilities - objectiveC' }

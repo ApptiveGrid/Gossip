@@ -8,6 +8,13 @@ Class {
 	#category : #Gossip
 }
 
+{ #category : #'as yet unclassified' }
+GossipEndpoint class >> address: address port: port [
+	^ self new 
+		address: address;
+		port: port
+]
+
 { #category : #'instance creation' }
 GossipEndpoint class >> fromUDP: result [ 
 	^ self new 

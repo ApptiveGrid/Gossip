@@ -1,10 +1,19 @@
 Class {
 	#name : #GossipMessage,
 	#superclass : #Object,
+	#instVars : [
+		'sender'
+	],
 	#category : #Gossip
 }
 
 { #category : #'as yet unclassified' }
 GossipMessage >> processIn: aGossiper for: anEndpoint [ 
-	self subclassResponsibility 
+	| states |
+	states := aGossiper endpointAt: sender
+]
+
+{ #category : #accessing }
+GossipMessage >> sender: aGossipEndpoint [ 
+	sender := aGossipEndpoint 
 ]
