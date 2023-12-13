@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'server',
 		'sender',
-		'endpoints'
+		'endpoints',
+		'seedNodes'
 	],
 	#classInstVars : [
 		'instance'
@@ -19,14 +20,39 @@ Gossiper class >> instance [
 ]
 
 { #category : #accessing }
+Gossiper >> address [
+	^ self server address
+]
+
+{ #category : #accessing }
+Gossiper >> address: address [ 
+	self server address: address
+]
+
+{ #category : #accessing }
+Gossiper >> endpoint [
+	^ self server endpoint
+]
+
+{ #category : #accessing }
 Gossiper >> endpoints [
 	^ endpoints ifNil: [ 
 		endpoints := GossipEndpoints new ]
 ]
 
+{ #category : #'as yet unclassified' }
+Gossiper >> gossip [
+	| message |
+	message := GossipSynMessage new
+		sender: self endpoint;  
+		digests: self endpoints digests.
+	self randomNodes do: [ :endpoint |
+		self sendMessage: message to: endpoint  ]
+]
+
 { #category : #accessing }
 Gossiper >> myEndpoint [
-	^ self endpoints at: GossipEndpoint me
+	^ self endpoints stateAt: self endpoint
 ]
 
 { #category : #accessing }
@@ -40,6 +66,11 @@ Gossiper >> port: anInteger [
 ]
 
 { #category : #'as yet unclassified' }
+Gossiper >> randomNodes [
+	^ self seedNodes
+]
+
+{ #category : #'as yet unclassified' }
 Gossiper >> received: aString from: endpoint [
 	self 
 		receivedMessage: (STON fromString: aString) 
@@ -50,6 +81,16 @@ Gossiper >> received: aString from: endpoint [
 { #category : #'as yet unclassified' }
 Gossiper >> receivedMessage: aMessage from: endpoint [
 	aMessage processIn: self for: endpoint
+]
+
+{ #category : #accessing }
+Gossiper >> seedNodes [
+	^ seedNodes
+]
+
+{ #category : #accessing }
+Gossiper >> seedNodes: aCollection [ 
+	seedNodes := aCollection
 ]
 
 { #category : #'utilities - objectiveC' }

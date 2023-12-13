@@ -16,7 +16,7 @@ GossipEndpointState >> initialize [
 { #category : #accessing }
 GossipEndpointState >> maxVersion [
 	^ states 
-		ifNotEmpty: [ self halt ]
+		ifNotEmpty: [ states values max: [ :each | each maxVersion ] ]
 		ifEmpty: [ 0 ]
 ]
 
@@ -32,4 +32,13 @@ GossipEndpointState >> stateAt: aString ifAbsentPut: aBlock [
 	^ states 
 		at: aString 
 		ifAbsentPut: aBlock
+]
+
+{ #category : #accessing }
+GossipEndpointState >> stateAt: aString put: anObject [	
+	| valueHolder |
+	valueHolder  := states 
+		at: aString 
+		ifAbsentPut: [ GossipVersionedValue new ].
+	valueHolder setValue: anObject
 ]

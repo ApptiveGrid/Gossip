@@ -16,6 +16,24 @@ GossipEndpoints class >> instance [
 		instance := self new ]
 ]
 
+{ #category : #accessing }
+GossipEndpoints >> at: endpoint overwrite: aGossipEndpointState [ 
+	Transcript show: 'updating ', endpoint asString; cr.
+	endpointStates at: endpoint put: aGossipEndpointState 
+]
+
+{ #category : #accessing }
+GossipEndpoints >> digests [
+	| digests |
+	digests := OrderedCollection new.
+	endpointStates keysAndValuesDo: [ :endpoint :states |
+		digests add: (GossipDigest 
+			endpoint: endpoint 
+			generation: 1 
+			version: states maxVersion ) ].
+	^ digests
+]
+
 { #category : #testing }
 GossipEndpoints >> includesKey: aGossipEndpoint [ 
 	^ endpointStates includesKey: aGossipEndpoint 

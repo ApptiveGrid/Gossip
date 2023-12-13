@@ -19,11 +19,12 @@ GossipDigest class >> endpoint: aGossipEndpoint generation: generation version: 
 
 { #category : #'as yet unclassified' }
 GossipDigest class >> exampleList [
-	^ (1 to: 5) collect: [ :n | 
+	<example>
+	^ GossipEndpoint exampleList collect: [ :endpoint | 
 		 GossipDigest 
-			endpoint: (GossipEndpoint address: { 1 . 2 . 3 . n } asByteArray port: 1000 + n)
-				generation: n 
-				version: n ]
+			endpoint: endpoint
+			generation: 1
+			version: 1 ]
 ]
 
 { #category : #'as yet unclassified' }

@@ -35,7 +35,8 @@ GossipSynMessage >> processIn: gossiper for: anEndpoint [
 						ifFalse: [ self halt ] ] ]
 			ifFalse: [ needed add: digest ] ].
 	ack := GossipAckMessage new 
+		sender: gossiper endpoint;
 		digests: needed.
-	gossiper sendMessage: ack to: anEndpoint 
+	gossiper sendMessage: ack to: sender
    
 ]

@@ -7,7 +7,8 @@ Class {
 		'socket',
 		'messageHandler',
 		'port',
-		'gossiper'
+		'gossiper',
+		'address'
 	],
 	#classInstVars : [
 		'instance'
@@ -22,8 +23,18 @@ GossipServer class >> instance [
 ]
 
 { #category : #accessing }
+GossipServer >> address: aCollection [
+	address := aCollection 
+]
+
+{ #category : #accessing }
 GossipServer >> defaultPort [ 
 	^ 1999
+]
+
+{ #category : #accessing }
+GossipServer >> endpoint [
+	^ GossipEndpoint address:  address port: port 
 ]
 
 { #category : #accessing }
@@ -77,6 +88,8 @@ GossipServer >> runLoop [
 
 { #category : #accessing }
 GossipServer >> stop [ 
-	process terminate.
-	socket closeAndDestroy 
+	process ifNotNil: [  
+		process terminate ].
+	socket ifNotNil: [  
+		socket closeAndDestroy ]
 ]

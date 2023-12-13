@@ -31,6 +31,13 @@ GossipEndpoint class >> example2 [
 		port: 4321
 ]
 
+{ #category : #examples }
+GossipEndpoint class >> exampleList [
+	<example>
+	^ (1 to: 10) collect: [ :n | 
+		 (GossipEndpoint address: { 127 . 0 . 0 . 1 } asByteArray port: 9000 + n) ]
+]
+
 { #category : #'instance creation' }
 GossipEndpoint class >> fromUDP: result [ 
 	^ self new 
