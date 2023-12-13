@@ -71,6 +71,12 @@ Gossiper >> myEndpointState [
 	^ self endpoints at: GossipEndpoint me
 ]
 
+{ #category : #'instance creation' }
+Gossiper >> newMessage: aClass [ 
+	^ aClass new
+		sender: self endpoint
+]
+
 { #category : #accessing }
 Gossiper >> port: anInteger [ 
 	self server port: anInteger 
@@ -96,7 +102,7 @@ Gossiper >> received: aString from: endpoint [
 
 { #category : #'as yet unclassified' }
 Gossiper >> receivedMessage: aMessage from: endpoint [
-	aMessage processIn: self for: endpoint
+	aMessage processIn: self
 ]
 
 { #category : #accessing }

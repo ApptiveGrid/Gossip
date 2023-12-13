@@ -20,7 +20,7 @@ GossipSynMessage >> digests: anObject [
 ]
 
 { #category : #'as yet unclassified' }
-GossipSynMessage >> processIn: gossiper for: anEndpoint [ 
+GossipSynMessage >> processIn: gossiper [
 	| states localEndpoints needed ack myStates |
 	localEndpoints := gossiper endpoints keys asOrderedCollection.
 	needed := OrderedCollection new.
@@ -37,8 +37,7 @@ GossipSynMessage >> processIn: gossiper for: anEndpoint [
 			ifFalse: [ needed add: digest ] ].
 	localEndpoints do: [ :endpoint |
 		myStates at: endpoint put: (gossiper endpoints stateAt: endpoint) ].
-	ack := GossipAckMessage new 
-		sender: gossiper endpoint;
+	ack := (gossiper newMessage: GossipAckMessage)
 		digests: needed;
 		delta: myStates.
 	gossiper sendMessage: ack to: sender

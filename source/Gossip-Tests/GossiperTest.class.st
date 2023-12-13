@@ -16,7 +16,7 @@ GossiperTest >> setUp [
 { #category : #tests }
 GossiperTest >> testReceiveAckOnSyn [
 	| message |
-	message := GossipSynMessage new 
+	message := (gossiper newMessage: GossipSynMessage) 
 		digests: GossipDigest exampleList.
 	gossiper 
 		receivedMessage: message 
