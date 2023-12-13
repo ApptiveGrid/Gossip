@@ -1,0 +1,9 @@
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'Gossip',
+      #directory : 'source',
+      #platforms : [ #pharo ]
+    }
+  ]
+}
