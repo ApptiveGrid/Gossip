@@ -14,6 +14,13 @@ GossipEndpointState >> initialize [
 ]
 
 { #category : #accessing }
+GossipEndpointState >> maxVersion [
+	^ states 
+		ifNotEmpty: [ self halt ]
+		ifEmpty: [ 0 ]
+]
+
+{ #category : #accessing }
 GossipEndpointState >> stateAt: aString [ 
 	^ states 
 		at: aString 

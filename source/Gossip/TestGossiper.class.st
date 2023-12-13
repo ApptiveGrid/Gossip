@@ -2,7 +2,8 @@ Class {
 	#name : #TestGossiper,
 	#superclass : #Gossiper,
 	#instVars : [
-		'receivedMessages'
+		'receivedMessages',
+		'sentMessages'
 	],
 	#category : #Gossip
 }
@@ -15,7 +16,8 @@ TestGossiper >> hasReceivedMessages [
 { #category : #initialization }
 TestGossiper >> initialize [ 
 	super initialize.
-	receivedMessages := OrderedCollection new
+	receivedMessages := OrderedCollection new.
+	sentMessages := OrderedCollection new
 ]
 
 { #category : #'as yet unclassified' }
@@ -27,4 +29,14 @@ TestGossiper >> received: aMessage from: endpoint [
 { #category : #'as yet unclassified' }
 TestGossiper >> receivedMessages [
 	^ receivedMessages 
+]
+
+{ #category : #'utilities - objectiveC' }
+TestGossiper >> sendMessage: message toAdress: address  port: port [ 
+	sentMessages add: message
+]
+
+{ #category : #accessing }
+TestGossiper >> sentMessages [
+	^ sentMessages 
 ]

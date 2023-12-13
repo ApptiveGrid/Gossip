@@ -10,7 +10,8 @@ Class {
 { #category : #'as yet unclassified' }
 GossipMessage >> processIn: aGossiper for: anEndpoint [ 
 	| states |
-	states := aGossiper endpointAt: sender
+	states := aGossiper stateAt: anEndpoint.
+	self halt.
 ]
 
 { #category : #accessing }

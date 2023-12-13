@@ -16,11 +16,9 @@ GossipEndpoints class >> instance [
 		instance := self new ]
 ]
 
-{ #category : #accessing }
-GossipEndpoints >> endpointAt: key [
-	^  endpointStates 
-		at: key 
-		ifAbsentPut: [ GossipEndpointState new ]
+{ #category : #testing }
+GossipEndpoints >> includesKey: aGossipEndpoint [ 
+	^ endpointStates includesKey: aGossipEndpoint 
 ]
 
 { #category : #initialization }
@@ -30,13 +28,25 @@ GossipEndpoints >> initialize [
 ]
 
 { #category : #accessing }
-GossipEndpoints >> myEndpoint [
-	^ self endpointAt: GossipEndpoint me
+GossipEndpoints >> keys [
+	^ endpointStates keys
+]
+
+{ #category : #enumerating }
+GossipEndpoints >> keysAndValuesDo: aBlock [
+	endpointStates keysAndValuesDo: aBlock
 ]
 
 { #category : #accessing }
-GossipEndpoints >> stateAt: aString [ 
-	^ (self myEndpoint stateAt: aString) value
+GossipEndpoints >> myEndpoint [
+	^ self stateAt: GossipEndpoint me
+]
+
+{ #category : #accessing }
+GossipEndpoints >> stateAt: key [
+	^  endpointStates 
+		at: key 
+		ifAbsentPut: [ GossipEndpointState new ]
 ]
 
 { #category : #accessing }

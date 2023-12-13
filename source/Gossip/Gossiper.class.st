@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'server',
-		'sender'
+		'sender',
+		'endpoints'
 	],
 	#classInstVars : [
 		'instance'
@@ -15,6 +16,12 @@ Class {
 Gossiper class >> instance [ 
 	^ instance ifNil: [ 
 		instance := self new ]
+]
+
+{ #category : #accessing }
+Gossiper >> endpoints [
+	^ endpoints ifNil: [ 
+		endpoints := GossipEndpoints new ]
 ]
 
 { #category : #accessing }
@@ -42,7 +49,15 @@ Gossiper >> received: aString from: endpoint [
 
 { #category : #'as yet unclassified' }
 Gossiper >> receivedMessage: aMessage from: endpoint [
-	aMessage processIn: self endpoints for: endpoint
+	aMessage processIn: self for: endpoint
+]
+
+{ #category : #'utilities - objectiveC' }
+Gossiper >> sendMessage: aGossipSimpleMessage to: endpoint [
+	self
+		sendMessage: aGossipSimpleMessage 
+		toAdress: endpoint address 
+		port: endpoint port 
 ]
 
 { #category : #'utilities - objectiveC' }
