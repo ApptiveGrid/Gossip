@@ -2,12 +2,19 @@ Class {
 	#name : #GossipSynMessage,
 	#superclass : #GossipMessage,
 	#instVars : [
-		'list'
+		'digests'
 	],
 	#category : #Gossip
 }
 
 { #category : #accessing }
-GossipSynMessage >> list: anUndefinedObject [ 
-	list := anUndefinedObject 
+GossipSynMessage >> digests [
+
+	^ digests
+]
+
+{ #category : #accessing }
+GossipSynMessage >> digests: anObject [
+
+	digests := anObject
 ]

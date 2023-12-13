@@ -3,8 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'server',
-		'sender',
-		'endpointStates'
+		'sender'
 	],
 	#classInstVars : [
 		'instance'
@@ -19,21 +18,13 @@ Gossiper class >> instance [
 ]
 
 { #category : #accessing }
-Gossiper >> endpointAt: key [
-	^  endpointStates 
-		at: key 
-		ifAbsentPut: [ GossipEndpointState new ]
-]
-
-{ #category : #initialization }
-Gossiper >> initialize [ 
-	super initialize.
-	endpointStates := Dictionary new
+Gossiper >> myEndpoint [
+	^ self endpoints at: GossipEndpoint me
 ]
 
 { #category : #accessing }
-Gossiper >> myEndpoint [
-	^ self endpointAt: GossipEndpoint me
+Gossiper >> myEndpointState [
+	^ self endpoints at: GossipEndpoint me
 ]
 
 { #category : #accessing }
@@ -51,7 +42,7 @@ Gossiper >> received: aString from: endpoint [
 
 { #category : #'as yet unclassified' }
 Gossiper >> receivedMessage: aMessage from: endpoint [
-	aMessage processIn: self for: endpoint
+	aMessage processIn: self endpoints for: endpoint
 ]
 
 { #category : #'utilities - objectiveC' }
