@@ -1,7 +1,7 @@
 Class {
 	#name : #GossipDigestTest,
 	#superclass : #TestCase,
-	#category : #Gossip
+	#category : #'Gossip-Tests'
 }
 
 { #category : #tests }

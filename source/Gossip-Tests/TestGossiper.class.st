@@ -5,7 +5,7 @@ Class {
 		'receivedMessages',
 		'sentMessages'
 	],
-	#category : #Gossip
+	#category : #'Gossip-Tests'
 }
 
 { #category : #'as yet unclassified' }

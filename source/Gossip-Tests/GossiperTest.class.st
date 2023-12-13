@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'gossiper'
 	],
-	#category : #Gossip
+	#category : #'Gossip-Tests'
 }
 
 { #category : #running }
