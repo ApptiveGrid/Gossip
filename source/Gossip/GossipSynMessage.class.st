@@ -21,9 +21,10 @@ GossipSynMessage >> digests: anObject [
 
 { #category : #'as yet unclassified' }
 GossipSynMessage >> processIn: gossiper for: anEndpoint [ 
-	| states localEndpoints needed ack |
-	localEndpoints := gossiper endpoints keys.
+	| states localEndpoints needed ack myStates |
+	localEndpoints := gossiper endpoints keys asOrderedCollection.
 	needed := OrderedCollection new.
+	myStates := Dictionary new.
 	digests do: [ :digest | 
 		(gossiper endpoints includesKey: digest endpoint)
 			ifTrue: [  
@@ -31,12 +32,15 @@ GossipSynMessage >> processIn: gossiper for: anEndpoint [
 				states := gossiper endpoints stateAt: digest endpoint.
 				(states maxVersion = digest maxVersion) ifFalse: [ 
 					(states maxVersion > digest maxVersion) 
-						ifTrue: [ self halt ]
-						ifFalse: [ self halt ] ] ]
+						ifTrue: [ myStates at: digest endpoint put: states ]
+						ifFalse: [ needed add: digest ] ] ]
 			ifFalse: [ needed add: digest ] ].
+	localEndpoints do: [ :endpoint |
+		myStates at: endpoint put: (gossiper endpoints stateAt: endpoint) ].
 	ack := GossipAckMessage new 
 		sender: gossiper endpoint;
-		digests: needed.
+		digests: needed;
+		delta: myStates.
 	gossiper sendMessage: ack to: sender
    
 ]

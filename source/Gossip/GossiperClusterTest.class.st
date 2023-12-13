@@ -35,5 +35,7 @@ GossiperClusterTest >> testSendUpdate [
 	gossiper myEndpoint stateAt: #foo put: #bar.
 	gossiper gossip.
 	1 seconds wait.
-	
+	gossipers do: #gossip.
+	1 seconds wait.
+	self assert: (gossipers noneSatisfy: [ :g | g endpoints isEmpty ])	
 ]

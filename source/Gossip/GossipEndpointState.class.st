@@ -13,6 +13,11 @@ GossipEndpointState >> initialize [
 	states := Dictionary new
 ]
 
+{ #category : #testing }
+GossipEndpointState >> isEmpty [
+	^ states isEmpty
+]
+
 { #category : #accessing }
 GossipEndpointState >> maxVersion [
 	^ states 

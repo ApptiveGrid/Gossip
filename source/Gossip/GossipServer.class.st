@@ -74,7 +74,7 @@ GossipServer >> run [
 GossipServer >> runLoop [ 
 	| buffer result |
 	[ [ loop ] whileTrue: [
-		buffer := String new: 256.
+		buffer := String new: 4096.
 		socket waitForData.
 		result := socket receiveUDPDataInto: buffer.
 		gossiper 

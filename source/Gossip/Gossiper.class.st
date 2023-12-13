@@ -37,7 +37,9 @@ Gossiper >> endpoint [
 { #category : #accessing }
 Gossiper >> endpoints [
 	^ endpoints ifNil: [ 
-		endpoints := GossipEndpoints new ]
+		endpoints := GossipEndpoints new
+			gossiper: self;
+			yourself ]
 ]
 
 { #category : #'as yet unclassified' }
@@ -48,6 +50,15 @@ Gossiper >> gossip [
 		digests: self endpoints digests.
 	self randomNodes do: [ :endpoint |
 		self sendMessage: message to: endpoint  ]
+]
+
+{ #category : #private }
+Gossiper >> log: aString [ 
+	Transcript 
+		show: self endpoint asString;
+		show: ': ';
+		show: aString;
+		cr
 ]
 
 { #category : #accessing }
@@ -65,9 +76,14 @@ Gossiper >> port: anInteger [
 	self server port: anInteger 
 ]
 
+{ #category : #printing }
+Gossiper >> printOn: aStream [ 
+	aStream << 'gossiper: ' << self endpoint asString
+]
+
 { #category : #'as yet unclassified' }
 Gossiper >> randomNodes [
-	^ self seedNodes
+	^ self seedNodes copyWithout: self endpoint
 ]
 
 { #category : #'as yet unclassified' }
@@ -112,7 +128,9 @@ Gossiper >> sendMessage: aGossipSimpleMessage toAdress: aCollection port: anInte
 { #category : #accessing }
 Gossiper >> sender [
 	^ sender ifNil: [ 
-		sender := GossipSender new  ]
+		sender := GossipSender new
+			gossiper: self;
+			yourself  ]
 ]
 
 { #category : #accessing }

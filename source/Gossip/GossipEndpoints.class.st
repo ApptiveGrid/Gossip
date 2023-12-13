@@ -2,6 +2,7 @@ Class {
 	#name : #GossipEndpoints,
 	#superclass : #Object,
 	#instVars : [
+		'gossiper',
 		'endpointStates'
 	],
 	#classInstVars : [
@@ -18,8 +19,9 @@ GossipEndpoints class >> instance [
 
 { #category : #accessing }
 GossipEndpoints >> at: endpoint overwrite: aGossipEndpointState [ 
-	Transcript show: 'updating ', endpoint asString; cr.
-	endpointStates at: endpoint put: aGossipEndpointState 
+	gossiper log: 'updating ', endpoint asString.
+	aGossipEndpointState isEmpty ifFalse: [  
+	endpointStates at: endpoint put: aGossipEndpointState ]
 ]
 
 { #category : #accessing }
@@ -34,6 +36,11 @@ GossipEndpoints >> digests [
 	^ digests
 ]
 
+{ #category : #accessing }
+GossipEndpoints >> gossiper: aGossiper [ 
+	gossiper := aGossiper
+]
+
 { #category : #testing }
 GossipEndpoints >> includesKey: aGossipEndpoint [ 
 	^ endpointStates includesKey: aGossipEndpoint 
@@ -43,6 +50,11 @@ GossipEndpoints >> includesKey: aGossipEndpoint [
 GossipEndpoints >> initialize [ 
 	super initialize.
 	endpointStates := Dictionary new
+]
+
+{ #category : #testing }
+GossipEndpoints >> isEmpty [ 
+	^ endpointStates isEmpty
 ]
 
 { #category : #accessing }
