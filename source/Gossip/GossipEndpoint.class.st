@@ -15,6 +15,22 @@ GossipEndpoint class >> address: address port: port [
 		port: port
 ]
 
+{ #category : #examples }
+GossipEndpoint class >> example1 [ 
+	<script> 
+	^ self new 
+		address: #[ 1 2 3 4];
+		port: 1234
+]
+
+{ #category : #examples }
+GossipEndpoint class >> example2 [
+	<script> 
+	^ self new 
+		address: #[ 4 3 2 1 ];
+		port: 4321
+]
+
 { #category : #'instance creation' }
 GossipEndpoint class >> fromUDP: result [ 
 	^ self new 

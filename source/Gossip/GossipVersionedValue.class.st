@@ -8,6 +8,18 @@ Class {
 	#category : #Gossip
 }
 
+{ #category : #accessing }
+GossipVersionedValue >> maxVersion [
+
+	^ version
+]
+
+{ #category : #accessing }
+GossipVersionedValue >> maxVersion: anObject [
+
+	version := anObject
+]
+
 { #category : #printing }
 GossipVersionedValue >> printOn: aStream [ 
 	aStream << '[' << value printString << ':'  << version printString << ']' 
@@ -30,16 +42,4 @@ GossipVersionedValue >> value [
 GossipVersionedValue >> value: anObject [
 
 	value := anObject
-]
-
-{ #category : #accessing }
-GossipVersionedValue >> version [
-
-	^ version
-]
-
-{ #category : #accessing }
-GossipVersionedValue >> version: anObject [
-
-	version := anObject
 ]
