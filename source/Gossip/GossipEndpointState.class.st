@@ -2,39 +2,57 @@ Class {
 	#name : #GossipEndpointState,
 	#superclass : #Object,
 	#instVars : [
-		'states'
+		'heartbeatState',
+		'applicationStates',
+		'maxVersion'
 	],
 	#category : #Gossip
 }
 
+{ #category : #accessing }
+GossipEndpointState >> generation: anInteger [ 
+	heartbeatState generation: anInteger 
+]
+
+{ #category : #accessing }
+GossipEndpointState >> heartbeatState [
+	^ heartbeatState
+]
+
 { #category : #initialization }
 GossipEndpointState >> initialize [ 
 	super initialize.
-	states := Dictionary new
+	applicationStates := Dictionary new.
+	maxVersion := 0.
+	heartbeatState := GossipHeartbeatState new
+		version: self nextVersion
 ]
 
 { #category : #testing }
 GossipEndpointState >> isEmpty [
-	^ states isEmpty
+	^ applicationStates isEmpty
 ]
 
 { #category : #accessing }
 GossipEndpointState >> maxVersion [
-	^ states 
-		ifNotEmpty: [ states values max: [ :each | each maxVersion ] ]
-		ifEmpty: [ 0 ]
+	^ maxVersion 
+]
+
+{ #category : #utilities }
+GossipEndpointState >> nextVersion [
+	^ maxVersion := maxVersion + 1
 ]
 
 { #category : #accessing }
 GossipEndpointState >> stateAt: aString [ 
-	^ states 
+	^ applicationStates 
 		at: aString 
 		ifAbsent: [ KeyNotFound signal: 'state ', aString printString, ' not found' ]
 ]
 
 { #category : #accessing }
 GossipEndpointState >> stateAt: aString ifAbsentPut: aBlock [
-	^ states 
+	^ applicationStates 
 		at: aString 
 		ifAbsentPut: aBlock
 ]
@@ -42,8 +60,8 @@ GossipEndpointState >> stateAt: aString ifAbsentPut: aBlock [
 { #category : #accessing }
 GossipEndpointState >> stateAt: aString put: anObject [	
 	| valueHolder |
-	valueHolder  := states 
+	valueHolder  := applicationStates 
 		at: aString 
-		ifAbsentPut: [ GossipVersionedValue new ].
-	valueHolder setValue: anObject
+		ifAbsentPut: [ GossipApplicationState new ].
+	valueHolder setValue: anObject endpointState: self
 ]

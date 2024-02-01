@@ -34,8 +34,8 @@ GossiperClusterTest >> testSendUpdate [
 	gossiper := gossipers last.
 	gossiper myEndpoint stateAt: #foo put: #bar.
 	gossiper gossip.
-	1 seconds wait.
+	10 milliSeconds wait.
 	gossipers do: #gossip.
-	1 seconds wait.
+	10 milliSeconds wait.
 	self assert: (gossipers noneSatisfy: [ :g | g endpoints isEmpty ])	
 ]

@@ -5,7 +5,8 @@ Class {
 		'server',
 		'sender',
 		'endpoints',
-		'seedNodes'
+		'seedNodes',
+		'generation'
 	],
 	#classInstVars : [
 		'instance'
@@ -42,6 +43,11 @@ Gossiper >> endpoints [
 			yourself ]
 ]
 
+{ #category : #accessing }
+Gossiper >> generation [
+	^ generation 
+]
+
 { #category : #'as yet unclassified' }
 Gossiper >> gossip [
 	| message |
@@ -50,6 +56,13 @@ Gossiper >> gossip [
 		digests: self endpoints digests.
 	self randomNodes do: [ :endpoint |
 		self sendMessage: message to: endpoint  ]
+]
+
+{ #category : #initialization }
+Gossiper >> initialize [ 
+	super initialize.
+	generation := Time microsecondClockValue.
+	self myEndpoint generation: generation 
 ]
 
 { #category : #private }
@@ -163,8 +176,8 @@ Gossiper >> stateAt: key put: value [
 	| valueHolder |
 	valueHolder := self myEndpoint 
 		stateAt: key
-		ifAbsentPut: [ GossipVersionedValue new ].
-	valueHolder setValue: value
+		ifAbsentPut: [ GossipApplicationState new  ].
+	valueHolder setValue: value endpointState: self myEndpoint 
 	
 ]
 

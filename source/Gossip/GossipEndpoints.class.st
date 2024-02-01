@@ -69,7 +69,7 @@ GossipEndpoints >> keysAndValuesDo: aBlock [
 
 { #category : #accessing }
 GossipEndpoints >> myEndpoint [
-	^ self stateAt: GossipEndpoint me
+	^ self stateAt: gossiper myEndpoint
 ]
 
 { #category : #accessing }
@@ -84,7 +84,7 @@ GossipEndpoints >> stateAt: key put: value [
 	| valueHolder |
 	valueHolder := self myEndpoint 
 		stateAt: key
-		ifAbsentPut: [ GossipVersionedValue new ].
-	valueHolder setValue: value
+		ifAbsentPut: [ GossipApplicationState new ].
+	valueHolder setValue: value endpointState: self
 	
 ]

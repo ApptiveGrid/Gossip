@@ -22,8 +22,9 @@ TestGossiper >> initialize [
 
 { #category : #'as yet unclassified' }
 TestGossiper >> received: aMessage from: endpoint [
+	receivedMessages add: (endpoint -> aMessage).
 	super received: aMessage from: endpoint.
-	receivedMessages add: (endpoint -> aMessage)
+
 ]
 
 { #category : #'as yet unclassified' }
@@ -33,7 +34,8 @@ TestGossiper >> receivedMessages [
 
 { #category : #'utilities - objectiveC' }
 TestGossiper >> sendMessage: message toAdress: address  port: port [ 
-	sentMessages add: message
+	sentMessages add: message.
+	super sendMessage: message toAdress: address  port: port 
 ]
 
 { #category : #accessing }
