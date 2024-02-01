@@ -10,16 +10,18 @@ Class {
 		'gossiper',
 		'address'
 	],
-	#classInstVars : [
-		'instance'
-	],
 	#category : #Gossip
 }
 
+{ #category : #'as yet unclassified' }
+GossipServer class >> myAddress [
+	^ NetNameResolver addressForName:  NetNameResolver localHostName
+]
+
 { #category : #accessing }
-GossipServer class >> instance [ 
-	^ instance ifNil: [ 
-		instance := self new ]
+GossipServer >> address [ 
+	^ address ifNil: [ 
+		address := self class myAddress ]
 ]
 
 { #category : #accessing }
@@ -34,7 +36,7 @@ GossipServer >> defaultPort [
 
 { #category : #accessing }
 GossipServer >> endpoint [
-	^ GossipEndpoint address:  address port: port 
+	^ GossipEndpoint address:  self address port: port 
 ]
 
 { #category : #accessing }

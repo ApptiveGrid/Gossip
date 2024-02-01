@@ -11,6 +11,8 @@ Class {
 GossiperTest >> setUp [ 
 	super setUp.
 	gossiper := TestGossiper new 
+		port: 9000;
+		start
 ]
 
 { #category : #tests }

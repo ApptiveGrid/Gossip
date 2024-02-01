@@ -62,7 +62,6 @@ Gossiper >> gossip [
 Gossiper >> initialize [ 
 	super initialize.
 	generation := Time microsecondClockValue.
-	self myEndpoint generation: generation 
 ]
 
 { #category : #private }
@@ -77,11 +76,6 @@ Gossiper >> log: aString [
 { #category : #accessing }
 Gossiper >> myEndpoint [
 	^ self endpoints stateAt: self endpoint
-]
-
-{ #category : #accessing }
-Gossiper >> myEndpointState [
-	^ self endpoints at: GossipEndpoint me
 ]
 
 { #category : #'instance creation' }
@@ -162,6 +156,7 @@ Gossiper >> server [
 
 { #category : #accessing }
 Gossiper >> start [ 
+	self myEndpoint generation: generation.
 	self server run
 
 ]
