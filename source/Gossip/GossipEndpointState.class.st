@@ -88,6 +88,11 @@ GossipEndpointState >> heartbeatState: aGossipHeartbeatState [
 	heartbeatState := aGossipHeartbeatState
 ]
 
+{ #category : #'as yet unclassified' }
+GossipEndpointState >> increaseHeartbeat [
+	self heartbeatState version: self nextVersion 
+]
+
 { #category : #initialization }
 GossipEndpointState >> initialize [ 
 	super initialize.
@@ -129,7 +134,7 @@ GossipEndpointState >> processDigest: digest forMessage: message [
 			ifFalse: [
 				"our generation is more actual so we send the complete states"
 				"delta at: endpointState endpoint put: endpointState allStates."
-				message updateEndpoint: digest with: self allStates.
+				message updateEndpoint: digest endpoint with: self allStates.
 				^ self ]
 		].
 	"if both versions match there is nothing to do"
@@ -147,5 +152,5 @@ GossipEndpointState >> processDigest: digest forMessage: message [
 				"we have higher state version. So we generate the delta of states
 				between the remote version and our local one"
 				"delta at: endpointState endpoint put: (endpointState applicationStatesAfterVersion: digest version)"
-				message updateEndpoint: digest with: (self applicationStatesAfterVersion: digest version) ] ] 
+				message updateEndpoint: digest endpoint with: (self applicationStatesAfterVersion: digest version) ] ] 
 ]

@@ -25,11 +25,16 @@ GossipAck2Message >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
+GossipAck2Message >> processDigests: digestList in: endpoints [ 
+	^ endpoints processDigests: digestList forMessage: self 
+]
+
+{ #category : #'as yet unclassified' }
 GossipAck2Message >> processIn: aGossiper [
 	aGossiper endpoints processAck2Message: self
 ]
 
 { #category : #'as yet unclassified' }
-GossipAck2Message >> updateEndpoint: digest with: stateDelta [ 
-	delta at: digest endpoint put: stateDelta 
+GossipAck2Message >> updateEndpoint: endpoint with: stateDelta [ 
+	delta at: endpoint put: stateDelta 
 ]

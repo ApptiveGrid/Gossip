@@ -27,7 +27,7 @@ GossipEndpointStateDelta >> applicationStates: aCollection [
 
 { #category : #'as yet unclassified' }
 GossipEndpointStateDelta >> applyChangesTo: endpointState [ 
-	endpointState heartbeatState: heartbeatState.
+	endpointState heartbeatState updateFrom: heartbeatState.
 	applicationStates keysAndValuesDo: [ :key :value |
 		endpointState applicationStateAt: key overwrite: value ]
 ]

@@ -25,19 +25,20 @@ GossipEndpoints >> applyChanges: aDictionary [
 			at: endpoint
 			ifAbsentPut: [
 				GossipEndpointState new
-					endpoint: endpoint ].
-		endpointState applyChangesTo: localEndpointState  ]
+					endpoint: endpoint;
+					generation: endpointState heartbeatState generation ].
+		endpointState applyChangesTo: localEndpointState ]
 ]
 
 { #category : #accessing }
 GossipEndpoints >> digests [
 	| digests |
 	digests := OrderedCollection new.
-	endpointStates keysAndValuesDo: [ :endpoint :states |
+	endpointStates keysAndValuesDo: [ :endpoint :enpointState |
 		digests add: (GossipDigest 
 			endpoint: endpoint 
-			generation: gossiper generation 
-			version: states maxVersion ) ].
+			generation: enpointState generation 
+			version: enpointState maxVersion ) ].
 	^ digests
 ]
 
@@ -147,7 +148,24 @@ GossipEndpoints >> processDigest: digest forMessage: message [
 ]
 
 { #category : #'as yet unclassified' }
-GossipEndpoints >> processDigests: synDigests forMessage: ack2Message [ 
-	synDigests do: [ :digest |
+GossipEndpoints >> processDigests: digestList forMessage: ack2Message [ 
+	digestList do: [ :digest |
 		self processDigest: digest forMessage: ack2Message ].  
+]
+
+{ #category : #'as yet unclassified' }
+GossipEndpoints >> processDigestsAndState: digestList forMessage: ack2Message [ 
+	| localEndpoints |
+	localEndpoints := endpointStates keys asOrderedCollection.
+	digestList do: [ :digest |
+		localEndpoints remove: digest endpoint ifAbsent: [ ].
+		self processDigest: digest forMessage: ack2Message ].  
+	localEndpoints do: [ :endpoint | 
+		ack2Message updateEndpoint: endpoint with: (endpointStates at: endpoint) allStates ]
+	
+]
+
+{ #category : #'as yet unclassified' }
+GossipEndpoints >> processSynMessage: ackMessage for: ack2Message [ 
+	self processDigestsAndState: ackMessage digests forMessage: ack2Message
 ]

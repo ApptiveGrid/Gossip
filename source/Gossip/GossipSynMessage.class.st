@@ -23,9 +23,7 @@ GossipSynMessage >> digests: anObject [
 GossipSynMessage >> processIn: gossiper [
 	| ack |
 	ack := gossiper newMessage: GossipAckMessage.
-	gossiper endpoints 
-		processDigests: digests 
-		forMessage: ack.
+	gossiper endpoints processSynMessage: self for: ack.
 	gossiper 
 		sendMessage: ack 
 		to: sender

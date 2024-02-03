@@ -6,7 +6,9 @@ Class {
 		'sender',
 		'endpoints',
 		'seedNodes',
-		'generation'
+		'generation',
+		'process',
+		'duration'
 	],
 	#classInstVars : [
 		'instance'
@@ -31,8 +33,21 @@ Gossiper >> address: address [
 ]
 
 { #category : #accessing }
-Gossiper >> endpoint [
-	^ self server endpoint
+Gossiper >> defaultDuration [
+	^ 1 second
+]
+
+{ #category : #accessing }
+Gossiper >> duration [
+
+	^ duration ifNil: [ 
+		duration := self defaultDuration ]
+]
+
+{ #category : #accessing }
+Gossiper >> duration: anObject [
+
+	duration := anObject
 ]
 
 { #category : #accessing }
@@ -51,8 +66,9 @@ Gossiper >> generation [
 { #category : #'as yet unclassified' }
 Gossiper >> gossip [
 	| message |
+	self localEndpointState increaseHeartbeat.
 	message := GossipSynMessage new
-		sender: self endpoint;  
+		sender: self localEndpoint;  
 		digests: self endpoints digests.
 	self randomNodes do: [ :endpoint |
 		self sendMessage: message to: endpoint  ]
@@ -61,16 +77,22 @@ Gossiper >> gossip [
 { #category : #initialization }
 Gossiper >> initialize [ 
 	super initialize.
-	generation := Time microsecondClockValue.
+	generation := (Time microsecondClockValue / 1000) rounded .
 ]
 
 { #category : #accessing }
 Gossiper >> localEndpoint [
+	^ self server endpoint
+]
+
+{ #category : #accessing }
+Gossiper >> localEndpointState [
 	^ self endpoints 
-		endpointStateAt: self endpoint
+		endpointStateAt: self localEndpoint
 		ifAbsentPut: [ 
+			Transcript show: 'initializing ', self localEndpoint printString, ' with generation ', generation printString; cr.
 			GossipEndpointState new
-				endpoint: self endpoint;
+				endpoint: self localEndpoint;
 				generation: generation;
 				yourself  ]
 ]
@@ -78,7 +100,7 @@ Gossiper >> localEndpoint [
 { #category : #private }
 Gossiper >> log: aString [ 
 	Transcript 
-		show: self endpoint asString;
+		show: self localEndpoint asString;
 		show: ': ';
 		show: aString;
 		cr
@@ -87,7 +109,7 @@ Gossiper >> log: aString [
 { #category : #'instance creation' }
 Gossiper >> newMessage: aClass [ 
 	^ aClass new
-		sender: self endpoint
+		sender: self localEndpoint
 ]
 
 { #category : #accessing }
@@ -97,12 +119,12 @@ Gossiper >> port: anInteger [
 
 { #category : #printing }
 Gossiper >> printOn: aStream [ 
-	aStream << 'gossiper: ' << self endpoint asString
+	aStream << 'gossiper: ' << self localEndpoint asString
 ]
 
 { #category : #'as yet unclassified' }
 Gossiper >> randomNodes [
-	^ self seedNodes copyWithout: self endpoint
+	^ self seedNodes copyWithout: self localEndpoint
 ]
 
 { #category : #'as yet unclassified' }
@@ -116,6 +138,19 @@ Gossiper >> received: aString from: endpoint [
 { #category : #'as yet unclassified' }
 Gossiper >> receivedMessage: aMessage from: endpoint [
 	aMessage processIn: self
+]
+
+{ #category : #accessing }
+Gossiper >> run [
+	process ifNotNil: [ process terminate ].
+	process := [ self runLoop ] forkNamed: self localEndpoint printString, ' gossiper loop'
+]
+
+{ #category : #accessing }
+Gossiper >> runLoop [
+	[ self gossip.
+		self duration wait ] repeat
+	
 ]
 
 { #category : #accessing }
@@ -162,9 +197,8 @@ Gossiper >> server [
 
 { #category : #accessing }
 Gossiper >> start [ 
-	self localEndpoint generation: generation.
-	self server run
-
+	self server run.
+	self run
 ]
 
 { #category : #accessing }

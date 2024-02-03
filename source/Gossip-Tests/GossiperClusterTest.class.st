@@ -15,6 +15,7 @@ GossiperClusterTest >> setUp [
 	list := GossipEndpoint exampleList.
 	list do: [ :endpoint |
 		gossipers add: (Gossiper new 
+			duration: 10 milliseconds;
 			address: endpoint address; 
 			port: endpoint port;
 			seedNodes: (list first: 3);
@@ -32,11 +33,8 @@ GossiperClusterTest >> tearDown [
 GossiperClusterTest >> testSendUpdate [
 	| gossiper |
 	gossiper := gossipers last.
-	gossiper localEndpoint applicationStateAt: #foo put: #bar.
-	gossiper gossip.
-	10 milliSeconds wait.
-	gossipers do: #gossip.
-	10 milliSeconds wait.
-	self assert: (gossipers noneSatisfy: [ :g | g endpoints isEmpty ]).
+	gossiper localEndpointState applicationStateAt: #foo put: #bar.
+	300 milliSeconds wait.
+	self assert: (gossipers allSatisfy: [ :g | g endpoints keys size = 5 ]).
 
 ]

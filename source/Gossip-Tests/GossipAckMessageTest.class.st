@@ -86,3 +86,26 @@ GossipAckMessageTest >> testRemoteStateHasLowerVersion [
 	self assert: (ack delta includesKey: localEndpoint).
 	self assert: ((ack delta at: localEndpoint) applicationStates at: #foo) version equals: 2
 ]
+
+{ #category : #tests }
+GossipAckMessageTest >> testUnknownStateUpdate [
+	| localEndpoint endpoints digest ack endpointState |
+	localEndpoint := GossipEndpoint example1.
+	endpoints := GossipEndpoints new.
+	endpointState := (endpoints newEndpointStateFor: localEndpoint)
+		generation: 4321;
+		applicationStateAt: #foo put: #bar;
+		yourself.
+	(endpoints newEndpointStateFor: GossipEndpoint example2)
+		generation: 1234;
+		applicationStateAt: #extra put: #entry;
+		yourself.
+	digest := GossipDigest endpoint: localEndpoint generation: 4321 version: 3.
+	ack := GossipAckMessage new
+		sender: localEndpoint.
+	endpoints processDigestsAndState: { digest } forMessage: ack.
+	self assert: ack digests size equals: 1.
+	self assert: ack digests first version equals: 2.
+	self assert: ack delta size equals: 1.
+	self assert: ((ack delta at: GossipEndpoint example2) applicationStates at: #extra) version equals: 2
+]

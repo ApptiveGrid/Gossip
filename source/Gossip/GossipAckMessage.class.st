@@ -62,6 +62,6 @@ GossipAckMessage >> requestUpdatesFrom: digest since: anInteger [
 ]
 
 { #category : #'as yet unclassified' }
-GossipAckMessage >> updateEndpoint: digest with: stateDelta [ 
-	delta at: digest endpoint put: stateDelta 
+GossipAckMessage >> updateEndpoint: endpoint with: stateDelta [ 
+	delta at: endpoint put: stateDelta 
 ]
