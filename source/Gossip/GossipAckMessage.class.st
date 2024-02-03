@@ -39,15 +39,16 @@ GossipAckMessage >> initialize [
 
 { #category : #initialization }
 GossipAckMessage >> initializeFromDigests: synDigests andEndpoints: endpoints [ 
-	synDigests do: [ :digest | 
-		self 
-			processDigest: digest 
-			forEndpointState: (endpoints 
-				endpointStateAt: digest endpoint
-				ifAbsentPut: [
-					GossipEndpointState new
-						endpoint: digest endpoint;
-						generation: digest generation ] ) ].  
+	synDigests do: [ :digest |
+		(endpoints endpointStateAt: digest endpoint ifAbsent: [ nil ])
+			ifNotNil: [ :endpointState |
+				self 
+					processDigest: digest 
+					forEndpointState: endpointState ]
+			ifNil: [ 
+				"if endpoint is not known we need request all states from
+				remote peer"
+				digests add: digest fromStart ] ].  
 ]
 
 { #category : #initialization }

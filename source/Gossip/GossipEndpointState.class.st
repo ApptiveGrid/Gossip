@@ -12,7 +12,10 @@ Class {
 
 { #category : #'as yet unclassified' }
 GossipEndpointState >> allStates [
-	^ applicationStates 
+	^ GossipEndpointStateDelta new
+		heartbeatState: heartbeatState;
+		applicationStates: applicationStates 
+
 ]
 
 { #category : #accessing }
@@ -40,8 +43,10 @@ GossipEndpointState >> applicationStateAt: aString put: anObject [
 
 { #category : #'as yet unclassified' }
 GossipEndpointState >> applicationStatesAfterVersion: anInteger [ 
-	^ (applicationStates associations 
-		select: [ :assoc | assoc value version > anInteger ]) asDictionary 
+	^ GossipEndpointStateDelta new
+		heartbeatState: heartbeatState;
+		applicationStates: (applicationStates associations 
+			select: [ :assoc | assoc value version > anInteger ]) asDictionary
 ]
 
 { #category : #accessing }

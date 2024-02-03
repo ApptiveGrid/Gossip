@@ -70,6 +70,14 @@ GossipEndpoint >> address: anObject [
 	address := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GossipEndpoint >> generation: generation version: version [  
+	^ GossipDigest new 
+		endpoint: self;
+		generation: generation;
+		version: version
+]
+
 { #category : #comparing }
 GossipEndpoint >> hash [
 	^ address hash bitXor: port hash

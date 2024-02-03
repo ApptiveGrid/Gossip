@@ -17,6 +17,11 @@ GossipEndpoints class >> instance [
 		instance := self new ]
 ]
 
+{ #category : #'as yet unclassified' }
+GossipEndpoints >> applyChanges: aCollection [ 
+	aCollection ifNotEmpty: [ self halt. ]
+]
+
 { #category : #accessing }
 GossipEndpoints >> digests [
 	| digests |
@@ -36,6 +41,13 @@ GossipEndpoints >> endpointStateAt: key [
 		ifAbsentPut: [ 
 			GossipEndpointState new
 				endpoint: key ]
+]
+
+{ #category : #accessing }
+GossipEndpoints >> endpointStateAt: key ifAbsent: aBlock [
+	^  endpointStates 
+		at: key 
+		ifAbsent: aBlock
 ]
 
 { #category : #accessing }

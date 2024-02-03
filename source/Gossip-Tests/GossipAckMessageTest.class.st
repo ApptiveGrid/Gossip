@@ -5,10 +5,22 @@ Class {
 }
 
 { #category : #tests }
-GossipAckMessageTest >> testRemoteStateHasHigherGeneration [ 
-	| localEndpoint endpoints endpointState digest ack remoteEndpoint |
+GossipAckMessageTest >> testLocalEndpointNotPresent [
+	| localEndpoint endpoints digest ack |
 	localEndpoint := GossipEndpoint example1.
-	remoteEndpoint := GossipEndpoint example2.
+	endpoints := GossipEndpoints new.
+	digest := GossipDigest endpoint: localEndpoint generation: 4321 version: 3.
+	ack := GossipAckMessage new
+		sender: localEndpoint;
+		initializeFromDigests:  { digest } andEndpoints: endpoints.
+	self assert: ack digests size equals: 1.
+	self assert: ack digests first version equals: 0
+]
+
+{ #category : #tests }
+GossipAckMessageTest >> testRemoteStateHasHigherGeneration [ 
+	| localEndpoint endpoints endpointState digest ack |
+	localEndpoint := GossipEndpoint example1.
 	endpoints := GossipEndpoints new.
 	endpointState := (endpoints endpointStateAt: localEndpoint)
 		generation: 4321;
@@ -24,9 +36,8 @@ GossipAckMessageTest >> testRemoteStateHasHigherGeneration [
 
 { #category : #tests }
 GossipAckMessageTest >> testRemoteStateHasHigherVersion [ 
-	| localEndpoint endpoints endpointState digest ack remoteEndpoint |
+	| localEndpoint endpoints endpointState digest ack |
 	localEndpoint := GossipEndpoint example1.
-	remoteEndpoint := GossipEndpoint example2.
 	endpoints := GossipEndpoints new.
 	endpointState := (endpoints endpointStateAt: localEndpoint)
 		generation: 4321;
@@ -42,9 +53,8 @@ GossipAckMessageTest >> testRemoteStateHasHigherVersion [
 
 { #category : #tests }
 GossipAckMessageTest >> testRemoteStateHasLowerGeneration [ 
-	| localEndpoint endpoints endpointState digest ack remoteEndpoint |
+	| localEndpoint endpoints endpointState digest ack |
 	localEndpoint := GossipEndpoint example1.
-	remoteEndpoint := GossipEndpoint example2.
 	endpoints := GossipEndpoints new.
 	endpointState := (endpoints endpointStateAt: localEndpoint)
 		generation: 4321;
@@ -56,14 +66,13 @@ GossipAckMessageTest >> testRemoteStateHasLowerGeneration [
 		initializeFromDigests:  { digest } andEndpoints: endpoints.
 	self assert: ack delta size equals: 1.
 	self assert: (ack delta includesKey: localEndpoint).
-	self assert: ((ack delta at: localEndpoint) at: #foo) version equals: 2
+	self assert: ((ack delta at: localEndpoint) applicationStates at: #foo) version equals: 2
 ]
 
 { #category : #tests }
 GossipAckMessageTest >> testRemoteStateHasLowerVersion [ 
-	| localEndpoint endpoints endpointState digest ack remoteEndpoint |
+	| localEndpoint endpoints endpointState digest ack |
 	localEndpoint := GossipEndpoint example1.
-	remoteEndpoint := GossipEndpoint example2.
 	endpoints := GossipEndpoints new.
 	endpointState := (endpoints endpointStateAt: localEndpoint)
 		generation: 4321;
@@ -75,5 +84,5 @@ GossipAckMessageTest >> testRemoteStateHasLowerVersion [
 		initializeFromDigests:  { digest } andEndpoints: endpoints.
 	self assert: ack delta size equals: 1.
 	self assert: (ack delta includesKey: localEndpoint).
-	self assert: ((ack delta at: localEndpoint) at: #foo) version equals: 2 
+	self assert: ((ack delta at: localEndpoint) applicationStates at: #foo) version equals: 2
 ]
