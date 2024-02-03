@@ -16,5 +16,5 @@ GossipAck2Message >> delta: anObject [
 { #category : #'as yet unclassified' }
 GossipAck2Message >> processIn: aGossiper [
 	delta keysAndValuesDo: [ :endpoint :s |
-		aGossiper endpoints at: endpoint overwrite: s ]
+		aGossiper endpoints endpointStateAt: endpoint overwrite: s ]
 ]

@@ -32,10 +32,10 @@ GossiperClusterTest >> tearDown [
 GossiperClusterTest >> testSendUpdate [
 	| gossiper |
 	gossiper := gossipers last.
-	gossiper myEndpoint stateAt: #foo put: #bar.
+	gossiper myEndpoint applicationStateAt: #foo put: #bar.
 	gossiper gossip.
 	10 milliSeconds wait.
 	gossipers do: #gossip.
 	10 milliSeconds wait.
-	self assert: (gossipers noneSatisfy: [ :g | g endpoints isEmpty ])	
+	self assert: (gossipers noneSatisfy: [ :g | g endpoints isEmpty ]).
 ]

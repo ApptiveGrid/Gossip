@@ -75,7 +75,7 @@ Gossiper >> log: aString [
 
 { #category : #accessing }
 Gossiper >> myEndpoint [
-	^ self endpoints stateAt: self endpoint
+	^ self endpoints endpointStateAt: self endpoint
 ]
 
 { #category : #'instance creation' }

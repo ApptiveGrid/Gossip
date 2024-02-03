@@ -54,3 +54,8 @@ GossipApplicationState >> value: anObject [
 
 	value := anObject
 ]
+
+{ #category : #accessing }
+GossipApplicationState >> version [
+	^ version
+]

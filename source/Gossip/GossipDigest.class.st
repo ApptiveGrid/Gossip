@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'endpoint',
 		'generation',
-		'maxVersion'
+		'version'
 	],
 	#category : #Gossip
 }
@@ -14,7 +14,7 @@ GossipDigest class >> endpoint: aGossipEndpoint generation: generation version: 
 	^ self new 
 		endpoint: aGossipEndpoint;
 		generation: generation;
-		maxVersion: version
+		version: version
 ]
 
 { #category : #'as yet unclassified' }
@@ -31,7 +31,7 @@ GossipDigest class >> exampleList [
 GossipDigest >> compareTo: aGossipDigest [ 
 	(endpoint = aGossipDigest endpoint) ifFalse: [ Error signal: 'different endpoints' ].
 	^ (generation = aGossipDigest generation)
-		ifTrue: [ maxVersion - aGossipDigest maxVersion ]
+		ifTrue: [ version - aGossipDigest version ]
 		ifFalse: [ generation - aGossipDigest generation ]
 ]
 
@@ -45,6 +45,11 @@ GossipDigest >> endpoint: aGossipEndpoint [
 	endpoint := aGossipEndpoint 
 ]
 
+{ #category : #'instance creation' }
+GossipDigest >> fromStart [
+	^ self startingFrom: 0
+]
+
 { #category : #accessing }
 GossipDigest >> generation [
 	^ generation
@@ -55,19 +60,27 @@ GossipDigest >> generation: anInteger [
 	generation := anInteger 
 ]
 
-{ #category : #accessing }
-GossipDigest >> maxVersion [
-	^ maxVersion
-]
-
-{ #category : #versions }
-GossipDigest >> maxVersion: anInteger [ 
-	maxVersion := anInteger 
-]
-
 { #category : #printing }
 GossipDigest >> printOn: aStream [ 
 	aStream << 'digest: '.
 	endpoint printOn: aStream.
-	aStream << '/' << generation asString << '/' << maxVersion asString
+	aStream << '/' << generation asString << '/' << version asString
+]
+
+{ #category : #'as yet unclassified' }
+GossipDigest >> startingFrom: anInteger [ 
+	^ self class new 
+		endpoint: endpoint;
+		generation: generation;
+		version: anInteger
+]
+
+{ #category : #accessing }
+GossipDigest >> version [
+	^ version
+]
+
+{ #category : #versions }
+GossipDigest >> version: anInteger [ 
+	version := anInteger 
 ]

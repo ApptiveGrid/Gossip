@@ -4,10 +4,60 @@ Class {
 	#instVars : [
 		'heartbeatState',
 		'applicationStates',
-		'maxVersion'
+		'maxVersion',
+		'endpoint'
 	],
 	#category : #Gossip
 }
+
+{ #category : #'as yet unclassified' }
+GossipEndpointState >> allStates [
+	^ applicationStates 
+]
+
+{ #category : #accessing }
+GossipEndpointState >> applicationStateAt: aString [ 
+	^ applicationStates 
+		at: aString 
+		ifAbsent: [ KeyNotFound signal: 'state ', aString printString, ' not found' ]
+]
+
+{ #category : #accessing }
+GossipEndpointState >> applicationStateAt: aString ifAbsentPut: aBlock [
+	^ applicationStates 
+		at: aString 
+		ifAbsentPut: aBlock
+]
+
+{ #category : #accessing }
+GossipEndpointState >> applicationStateAt: aString put: anObject [	
+	| valueHolder |
+	valueHolder  := applicationStates 
+		at: aString 
+		ifAbsentPut: [ GossipApplicationState new ].
+	valueHolder setValue: anObject endpointState: self
+]
+
+{ #category : #'as yet unclassified' }
+GossipEndpointState >> applicationStatesAfterVersion: anInteger [ 
+	^ (applicationStates associations 
+		select: [ :assoc | assoc value version > anInteger ]) asDictionary 
+]
+
+{ #category : #accessing }
+GossipEndpointState >> endpoint [
+	^ endpoint
+]
+
+{ #category : #accessing }
+GossipEndpointState >> endpoint: aGossipEndpoint [ 
+	endpoint := aGossipEndpoint 
+]
+
+{ #category : #accessing }
+GossipEndpointState >> generation [
+	^ self heartbeatState generation
+]
 
 { #category : #accessing }
 GossipEndpointState >> generation: anInteger [ 
@@ -43,25 +93,7 @@ GossipEndpointState >> nextVersion [
 	^ maxVersion := maxVersion + 1
 ]
 
-{ #category : #accessing }
-GossipEndpointState >> stateAt: aString [ 
-	^ applicationStates 
-		at: aString 
-		ifAbsent: [ KeyNotFound signal: 'state ', aString printString, ' not found' ]
-]
-
-{ #category : #accessing }
-GossipEndpointState >> stateAt: aString ifAbsentPut: aBlock [
-	^ applicationStates 
-		at: aString 
-		ifAbsentPut: aBlock
-]
-
-{ #category : #accessing }
-GossipEndpointState >> stateAt: aString put: anObject [	
-	| valueHolder |
-	valueHolder  := applicationStates 
-		at: aString 
-		ifAbsentPut: [ GossipApplicationState new ].
-	valueHolder setValue: anObject endpointState: self
+{ #category : #printing }
+GossipEndpointState >> printOn: aStream [ 
+	aStream << 'endpoint state: ' << endpoint printString << ', maxVersion: ' << maxVersion printString
 ]
