@@ -64,6 +64,17 @@ Gossiper >> initialize [
 	generation := Time microsecondClockValue.
 ]
 
+{ #category : #accessing }
+Gossiper >> localEndpoint [
+	^ self endpoints 
+		endpointStateAt: self endpoint
+		ifAbsentPut: [ 
+			GossipEndpointState new
+				endpoint: self endpoint;
+				generation: generation;
+				yourself  ]
+]
+
 { #category : #private }
 Gossiper >> log: aString [ 
 	Transcript 
@@ -71,11 +82,6 @@ Gossiper >> log: aString [
 		show: ': ';
 		show: aString;
 		cr
-]
-
-{ #category : #accessing }
-Gossiper >> myEndpoint [
-	^ self endpoints endpointStateAt: self endpoint
 ]
 
 { #category : #'instance creation' }
@@ -156,23 +162,23 @@ Gossiper >> server [
 
 { #category : #accessing }
 Gossiper >> start [ 
-	self myEndpoint generation: generation.
+	self localEndpoint generation: generation.
 	self server run
 
 ]
 
 { #category : #accessing }
 Gossiper >> stateAt: aString [ 
-	^ (self myEndpoint stateAt: aString) value
+	^ (self localEndpoint stateAt: aString) value
 ]
 
 { #category : #accessing }
 Gossiper >> stateAt: key put: value [
 	| valueHolder |
-	valueHolder := self myEndpoint 
+	valueHolder := self localEndpoint 
 		stateAt: key
 		ifAbsentPut: [ GossipApplicationState new  ].
-	valueHolder setValue: value endpointState: self myEndpoint 
+	valueHolder setValue: value endpointState: self localEndpoint 
 	
 ]
 

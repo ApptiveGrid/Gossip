@@ -22,9 +22,10 @@ GossipSynMessage >> digests: anObject [
 { #category : #'as yet unclassified' }
 GossipSynMessage >> processIn: gossiper [
 	| ack |
-	ack := (gossiper newMessage: GossipAckMessage)
-		initializeFromDigests: digests 
-		andEndpoints: gossiper endpoints.
+	ack := gossiper newMessage: GossipAckMessage.
+	gossiper endpoints 
+		processDigests: digests 
+		forMessage: ack.
 	gossiper 
 		sendMessage: ack 
 		to: sender

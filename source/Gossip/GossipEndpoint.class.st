@@ -34,7 +34,7 @@ GossipEndpoint class >> example2 [
 { #category : #examples }
 GossipEndpoint class >> exampleList [
 	<example>
-	^ (1 to: 10) collect: [ :n | 
+	^ (1 to: 5) collect: [ :n | 
 		 (GossipEndpoint address: { 127 . 0 . 0 . 1 } asByteArray port: 9000 + n) ]
 ]
 

@@ -24,39 +24,12 @@ GossipAck2Message >> initialize [
 	delta := Dictionary new
 ]
 
-{ #category : #initialization }
-GossipAck2Message >> initializeFromAckMessage: aGossipAckMessage andEndpoints: endpoints [ 
-	endpoints applyChanges: aGossipAckMessage delta.
-	aGossipAckMessage digests do: [ :digest | | endpointState |
-		endpointState := endpoints 
-				endpointStateAt: digest endpoint
-				ifAbsentPut: [
-					GossipEndpointState new
-						endpoint: digest endpoint;
-						generation: digest generation ].
-		self 
-			processDigest: digest 
-			forEndpointState: endpointState ]
-]
-
-{ #category : #initialization }
-GossipAck2Message >> processDigest: digest forEndpointState: endpointState [ 
-	(digest generation = endpointState generation) ifFalse: [ 
-			(digest generation > endpointState generation)
-				ifTrue: [ self halt ]
-				ifFalse: [ self halt ]
-			].
-		(digest version = endpointState maxVersion) ifFalse: [ 
-			(digest version > endpointState maxVersion) 
-				ifTrue: [ self halt]
-				ifFalse: [ 
-					delta 
-						at: endpointState endpoint 
-						put: (endpointState applicationStatesAfterVersion: digest version)  ] ] 
+{ #category : #'as yet unclassified' }
+GossipAck2Message >> processIn: aGossiper [
+	aGossiper endpoints processAck2Message: self
 ]
 
 { #category : #'as yet unclassified' }
-GossipAck2Message >> processIn: aGossiper [
-	delta keysAndValuesDo: [ :endpoint :s |
-		aGossiper endpoints endpointStateAt: endpoint overwrite: s ]
+GossipAck2Message >> updateEndpoint: digest with: stateDelta [ 
+	delta at: digest endpoint put: stateDelta 
 ]

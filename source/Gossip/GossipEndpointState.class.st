@@ -33,6 +33,15 @@ GossipEndpointState >> applicationStateAt: aString ifAbsentPut: aBlock [
 ]
 
 { #category : #accessing }
+GossipEndpointState >> applicationStateAt: aString overwrite: anObject [	
+	applicationStates 
+		at: aString 
+		put: anObject
+
+	
+]
+
+{ #category : #accessing }
 GossipEndpointState >> applicationStateAt: aString put: anObject [	
 	| valueHolder |
 	valueHolder  := applicationStates 
@@ -74,6 +83,11 @@ GossipEndpointState >> heartbeatState [
 	^ heartbeatState
 ]
 
+{ #category : #accessing }
+GossipEndpointState >> heartbeatState: aGossipHeartbeatState [ 
+	heartbeatState := aGossipHeartbeatState
+]
+
 { #category : #initialization }
 GossipEndpointState >> initialize [ 
 	super initialize.
@@ -101,4 +115,37 @@ GossipEndpointState >> nextVersion [
 { #category : #printing }
 GossipEndpointState >> printOn: aStream [ 
 	aStream << 'endpoint state: ' << endpoint printString << ', maxVersion: ' << maxVersion printString
+]
+
+{ #category : #'as yet unclassified' }
+GossipEndpointState >> processDigest: digest forMessage: message [
+	(digest generation = self generation) ifFalse: [ 
+		(digest generation > self generation)
+			ifTrue: [  
+				"remote side has been restarted so we need a complete state refresh"
+				"digests add: digest fromStart."
+				message endpointRestartFor: digest.
+				^ self  ]
+			ifFalse: [
+				"our generation is more actual so we send the complete states"
+				"delta at: endpointState endpoint put: endpointState allStates."
+				message updateEndpoint: digest with: self allStates.
+				^ self ]
+		].
+	"if both versions match there is nothing to do"
+	(digest version = self maxVersion) ifFalse: [ 
+		"if incoming version is larger than local version than we 
+		need to acquire the delta between local and remote version"
+		(digest version > self maxVersion) 
+			ifTrue: [ 
+				"sender has newer state so we acquire the delta between local
+				and remote state"
+				"digests add: (digest startingFrom: endpointState maxVersion)."
+				message requestUpdatesFrom: digest since: self maxVersion.
+				^ self  ]
+			ifFalse: [ 
+				"we have higher state version. So we generate the delta of states
+				between the remote version and our local one"
+				"delta at: endpointState endpoint put: (endpointState applicationStatesAfterVersion: digest version)"
+				message updateEndpoint: digest with: (self applicationStatesAfterVersion: digest version) ] ] 
 ]

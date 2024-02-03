@@ -25,6 +25,13 @@ GossipEndpointStateDelta >> applicationStates: aCollection [
 	applicationStates := aCollection
 ]
 
+{ #category : #'as yet unclassified' }
+GossipEndpointStateDelta >> applyChangesTo: endpointState [ 
+	endpointState heartbeatState: heartbeatState.
+	applicationStates keysAndValuesDo: [ :key :value |
+		endpointState applicationStateAt: key overwrite: value ]
+]
+
 { #category : #accessing }
 GossipEndpointStateDelta >> generation [
 	^ self heartbeatState generation
