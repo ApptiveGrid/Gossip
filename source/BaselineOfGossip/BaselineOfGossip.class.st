@@ -18,8 +18,9 @@ BaselineOfGossip >> baseline: spec [
 				package: 'Gossip-Simulation-Tests' with: [ spec requires: #('Gossip' 'PharoDEVS') ].
 
 			spec
-				group: 'default' with: #('Core');
-				group: 'Core' with: #('Gossip' 'Gossip-Tests') ].
+				group: 'default' with: #('Core' 'Simulation');
+				group: 'Core' with: #('Gossip' 'Gossip-Tests');
+				group: 'Simulation' with: #('Gossip-Simulation-Tests') ].
 ]
 
 { #category : 'as yet unclassified' }
@@ -28,5 +29,5 @@ BaselineOfGossip >> pharodevs: spec [
 	spec
 		baseline: 'PharoDEVS' with: [ 
 			spec 
-				repository: 'github://ApptiveGrid/PharoDEVS/source']
+				repository: 'github://ApptiveGrid/PharoDEVS:main/source']
 ]
