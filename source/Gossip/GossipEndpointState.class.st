@@ -1,16 +1,17 @@
 Class {
-	#name : #GossipEndpointState,
-	#superclass : #Object,
+	#name : 'GossipEndpointState',
+	#superclass : 'Object',
 	#instVars : [
 		'heartbeatState',
 		'applicationStates',
 		'maxVersion',
 		'endpoint'
 	],
-	#category : #Gossip
+	#category : 'Gossip',
+	#package : 'Gossip'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipEndpointState >> allStates [
 	^ GossipEndpointStateDelta new
 		heartbeatState: heartbeatState;
@@ -18,21 +19,21 @@ GossipEndpointState >> allStates [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> applicationStateAt: aString [ 
 	^ applicationStates 
 		at: aString 
 		ifAbsent: [ KeyNotFound signal: 'state ', aString printString, ' not found' ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> applicationStateAt: aString ifAbsentPut: aBlock [
 	^ applicationStates 
 		at: aString 
 		ifAbsentPut: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> applicationStateAt: aString overwrite: anObject [	
 	applicationStates 
 		at: aString 
@@ -41,7 +42,7 @@ GossipEndpointState >> applicationStateAt: aString overwrite: anObject [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> applicationStateAt: aString put: anObject [	
 	| valueHolder |
 	valueHolder  := applicationStates 
@@ -50,7 +51,7 @@ GossipEndpointState >> applicationStateAt: aString put: anObject [
 	valueHolder setValue: anObject endpointState: self
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipEndpointState >> applicationStatesAfterVersion: anInteger [ 
 	^ GossipEndpointStateDelta new
 		heartbeatState: heartbeatState;
@@ -58,42 +59,42 @@ GossipEndpointState >> applicationStatesAfterVersion: anInteger [
 			select: [ :assoc | assoc value version > anInteger ]) asDictionary
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> endpoint [
 	^ endpoint
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> endpoint: aGossipEndpoint [ 
 	endpoint := aGossipEndpoint 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> generation [
 	^ self heartbeatState generation
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> generation: anInteger [ 
 	heartbeatState generation: anInteger 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> heartbeatState [
 	^ heartbeatState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> heartbeatState: aGossipHeartbeatState [ 
 	heartbeatState := aGossipHeartbeatState
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipEndpointState >> increaseHeartbeat [
 	self heartbeatState version: self nextVersion 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GossipEndpointState >> initialize [ 
 	super initialize.
 	applicationStates := Dictionary new.
@@ -102,27 +103,27 @@ GossipEndpointState >> initialize [
 		version: self nextVersion
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 GossipEndpointState >> isEmpty [
 	^ applicationStates isEmpty
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointState >> maxVersion [
 	^ maxVersion 
 ]
 
-{ #category : #utilities }
+{ #category : 'utilities' }
 GossipEndpointState >> nextVersion [
 	^ maxVersion := maxVersion + 1
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 GossipEndpointState >> printOn: aStream [ 
 	aStream << 'endpoint state: ' << endpoint printString << ', maxVersion: ' << maxVersion printString
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipEndpointState >> processDigest: digest forMessage: message [
 	(digest generation = self generation) ifFalse: [ 
 		(digest generation > self generation)

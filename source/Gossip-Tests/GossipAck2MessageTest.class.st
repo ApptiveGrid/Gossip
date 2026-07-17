@@ -1,10 +1,11 @@
 Class {
-	#name : #GossipAck2MessageTest,
-	#superclass : #TestCase,
-	#category : #'Gossip-Tests'
+	#name : 'GossipAck2MessageTest',
+	#superclass : 'TestCase',
+	#category : 'Gossip-Tests',
+	#package : 'Gossip-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipAck2MessageTest >> testRemoteHasOtherState [
 	| localEndpoint endpoints ack remoteEndpoint ack2 |
 	remoteEndpoint := GossipEndpoint example1.
@@ -23,7 +24,7 @@ GossipAck2MessageTest >> testRemoteHasOtherState [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipAck2MessageTest >> testRemoteNeedsAllStates [
 	| localEndpoint endpoints endpointState ack remoteEndpoint ack2 |
 	remoteEndpoint := GossipEndpoint example1.
@@ -43,7 +44,7 @@ GossipAck2MessageTest >> testRemoteNeedsAllStates [
 	self assert: (ack2 delta at: remoteEndpoint) applicationStates values first version equals: 2
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipAck2MessageTest >> testRemoteNeedsDeltaStates [
 	| localEndpoint endpoints endpointState ack remoteEndpoint ack2 |
 	remoteEndpoint := GossipEndpoint example1.

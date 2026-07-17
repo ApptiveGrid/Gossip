@@ -1,10 +1,11 @@
 Class {
-	#name : #GossipAckMessageTest,
-	#superclass : #TestCase,
-	#category : #'Gossip-Tests'
+	#name : 'GossipAckMessageTest',
+	#superclass : 'TestCase',
+	#category : 'Gossip-Tests',
+	#package : 'Gossip-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipAckMessageTest >> testLocalEndpointNotPresent [
 	| localEndpoint endpoints digest ack |
 	localEndpoint := GossipEndpoint example1.
@@ -17,7 +18,7 @@ GossipAckMessageTest >> testLocalEndpointNotPresent [
 	self assert: ack digests first version equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipAckMessageTest >> testRemoteStateHasHigherGeneration [ 
 	| localEndpoint endpoints endpointState digest ack |
 	localEndpoint := GossipEndpoint example1.
@@ -34,7 +35,7 @@ GossipAckMessageTest >> testRemoteStateHasHigherGeneration [
 	self assert: ack digests first version equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipAckMessageTest >> testRemoteStateHasHigherVersion [ 
 	| localEndpoint endpoints endpointState digest ack |
 	localEndpoint := GossipEndpoint example1.
@@ -51,7 +52,7 @@ GossipAckMessageTest >> testRemoteStateHasHigherVersion [
 	self assert: ack digests first version equals: 2
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipAckMessageTest >> testRemoteStateHasLowerGeneration [ 
 	| localEndpoint endpoints endpointState digest ack |
 	localEndpoint := GossipEndpoint example1.
@@ -69,7 +70,7 @@ GossipAckMessageTest >> testRemoteStateHasLowerGeneration [
 	self assert: ((ack delta at: localEndpoint) applicationStates at: #foo) version equals: 2
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipAckMessageTest >> testRemoteStateHasLowerVersion [ 
 	| localEndpoint endpoints endpointState digest ack |
 	localEndpoint := GossipEndpoint example1.
@@ -87,7 +88,7 @@ GossipAckMessageTest >> testRemoteStateHasLowerVersion [
 	self assert: ((ack delta at: localEndpoint) applicationStates at: #foo) version equals: 2
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipAckMessageTest >> testUnknownStateUpdate [
 	| localEndpoint endpoints digest ack endpointState |
 	localEndpoint := GossipEndpoint example1.

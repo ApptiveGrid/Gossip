@@ -1,13 +1,14 @@
 Class {
-	#name : #GossiperTest,
-	#superclass : #TestCase,
+	#name : 'GossiperTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'gossiper'
 	],
-	#category : #'Gossip-Tests'
+	#category : 'Gossip-Tests',
+	#package : 'Gossip-Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 GossiperTest >> setUp [ 
 	super setUp.
 	gossiper := TestGossiper new 
@@ -15,7 +16,7 @@ GossiperTest >> setUp [
 		start
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossiperTest >> testReceiveAckOnSyn [
 	| message |
 	message := (gossiper newMessage: GossipSynMessage) 

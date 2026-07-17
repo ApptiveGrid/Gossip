@@ -1,10 +1,11 @@
 Class {
-	#name : #GossipDigestTest,
-	#superclass : #TestCase,
-	#category : #'Gossip-Tests'
+	#name : 'GossipDigestTest',
+	#superclass : 'TestCase',
+	#category : 'Gossip-Tests',
+	#package : 'Gossip-Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipDigestTest >> testDifferentEndpoints [
  	| digest1 digest2 |
 	digest1 := GossipDigest endpoint: GossipEndpoint example1 generation: 1 version: 100.
@@ -12,7 +13,7 @@ GossipDigestTest >> testDifferentEndpoints [
 	self should: [ digest1 compareTo: digest2 ] raise: Error
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipDigestTest >> testEqual [ 
  	| digest1 digest2 |
 	digest1 := GossipDigest endpoint: GossipEndpoint example1 generation: 1 version: 100.
@@ -20,7 +21,7 @@ GossipDigestTest >> testEqual [
 	self assert: (digest1 compareTo: digest2) equals: 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipDigestTest >> testLargerGeneration [ 
  	| digest1 digest2 |
 	digest1 := GossipDigest endpoint: GossipEndpoint example1 generation: 2 version: 100.
@@ -28,7 +29,7 @@ GossipDigestTest >> testLargerGeneration [
 	self assert: (digest1 compareTo: digest2) equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipDigestTest >> testLargerMaxVersion [ 
  	| digest1 digest2 |
 	digest1 := GossipDigest endpoint: GossipEndpoint example1 generation: 1 version: 102.
@@ -36,7 +37,7 @@ GossipDigestTest >> testLargerMaxVersion [
 	self assert: (digest1 compareTo: digest2) equals: 1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipDigestTest >> testSmallerGeneration [ 
  	| digest1 digest2 |
 	digest1 := GossipDigest endpoint: GossipEndpoint example1 generation: 1 version: 100.
@@ -44,7 +45,7 @@ GossipDigestTest >> testSmallerGeneration [
 	self assert: (digest1 compareTo: digest2) equals: -1
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossipDigestTest >> testSmallerMaxVersion [ 
  	| digest1 digest2 |
 	digest1 := GossipDigest endpoint: GossipEndpoint example1 generation: 1 version: 100.

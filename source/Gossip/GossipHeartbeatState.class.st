@@ -1,31 +1,32 @@
 Class {
-	#name : #GossipHeartbeatState,
-	#superclass : #Object,
+	#name : 'GossipHeartbeatState',
+	#superclass : 'Object',
 	#instVars : [
 		'generation',
 		'version'
 	],
-	#category : #Gossip
+	#category : 'Gossip',
+	#package : 'Gossip'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipHeartbeatState >> generation [
 
 	^ generation
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipHeartbeatState >> generation: anObject [
 
 	generation := anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 GossipHeartbeatState >> printOn: aStream [ 
 	aStream << 'heartbeat state: ' << generation printString << ':' << version printString
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipHeartbeatState >> updateFrom: aGossipHeartbeatState [ 
 	generation
 		ifNotNil: [ (generation = aGossipHeartbeatState generation) ifFalse: [ Error signal: 'generation mismatch' ] ] 
@@ -38,13 +39,13 @@ GossipHeartbeatState >> updateFrom: aGossipHeartbeatState [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipHeartbeatState >> version [
 
 	^ version
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipHeartbeatState >> version: anObject [
 
 	version := anObject

@@ -1,35 +1,35 @@
 Class {
-	#name : #GossiperClusterTest,
-	#superclass : #TestCase,
+	#name : 'GossiperClusterTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'gossipers'
 	],
-	#category : #'Gossip-Tests'
+	#category : 'Gossip-Tests',
+	#package : 'Gossip-Tests'
 }
 
-{ #category : #running }
-GossiperClusterTest >> setUp [ 
+{ #category : 'not defined protocol' }
+GossiperClusterTest >> setUp [
 	| list |
 	super setUp.
 	gossipers := OrderedCollection new.
 	list := GossipEndpoint exampleList.
 	list do: [ :endpoint |
 		gossipers add: (Gossiper new 
-			duration: 10 milliseconds;
+			duration: 10 milliSeconds;
 			address: endpoint address; 
 			port: endpoint port;
 			seedNodes: (list first: 3);
 			start) ].
-	
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 GossiperClusterTest >> tearDown [ 
 	super tearDown.
 	gossipers do: #stop
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 GossiperClusterTest >> testSendUpdate [
 	| gossiper |
 	gossiper := gossipers last.

@@ -1,25 +1,26 @@
 Class {
-	#name : #GossipSynMessage,
-	#superclass : #GossipMessage,
+	#name : 'GossipSynMessage',
+	#superclass : 'GossipMessage',
 	#instVars : [
 		'digests'
 	],
-	#category : #Gossip
+	#category : 'Gossip',
+	#package : 'Gossip'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipSynMessage >> digests [
 
 	^ digests
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipSynMessage >> digests: anObject [
 
 	digests := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipSynMessage >> processIn: gossiper [
 	| ack |
 	ack := gossiper newMessage: GossipAckMessage.
