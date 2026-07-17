@@ -1,53 +1,54 @@
 Class {
-	#name : #GossipAckMessage,
-	#superclass : #GossipMessage,
+	#name : 'GossipAckMessage',
+	#superclass : 'GossipMessage',
 	#instVars : [
 		'digests',
 		'delta'
 	],
-	#category : #Gossip
+	#category : 'Gossip',
+	#package : 'Gossip'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipAckMessage >> delta [
 
 	^ delta
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipAckMessage >> delta: anObject [
 
 	delta := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipAckMessage >> digests [
 	^ digests
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipAckMessage >> digests: aCollection [ 
 	digests := aCollection 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipAckMessage >> endpointRestartFor: digest [ 
 	digests add: digest fromStart.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipAckMessage >> endpointUnknownFor: digest [ 
 	digests add: digest fromStart 
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GossipAckMessage >> initialize [ 
 	super initialize.
 	digests := OrderedCollection new.
 	delta := Dictionary new
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipAckMessage >> processIn: aGossiper [
 	| ack2 |
 	ack2 := aGossiper newMessage: GossipAck2Message.
@@ -56,12 +57,12 @@ GossipAckMessage >> processIn: aGossiper [
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipAckMessage >> requestUpdatesFrom: digest since: anInteger [ 
 	digests add: (digest startingFrom: anInteger).
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipAckMessage >> updateEndpoint: endpoint with: stateDelta [ 
 	delta at: endpoint put: stateDelta 
 ]

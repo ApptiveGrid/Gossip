@@ -1,6 +1,6 @@
 Class {
-	#name : #GossipServer,
-	#superclass : #Object,
+	#name : 'GossipServer',
+	#superclass : 'Object',
 	#instVars : [
 		'loop',
 		'process',
@@ -10,59 +10,60 @@ Class {
 		'gossiper',
 		'address'
 	],
-	#category : #Gossip
+	#category : 'Gossip',
+	#package : 'Gossip'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipServer class >> myAddress [
 	^ NetNameResolver addressForName:  NetNameResolver localHostName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipServer >> address [ 
 	^ address ifNil: [ 
 		address := self class myAddress ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipServer >> address: aCollection [
 	address := aCollection 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipServer >> defaultPort [ 
 	^ 1999
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipServer >> endpoint [
 	^ GossipEndpoint address:  self address port: port 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipServer >> gossiper: anObject [
 
 	gossiper := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GossipServer >> initialize [ 
 	super initialize.
 	loop := true.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipServer >> port [ 
 	^ port ifNil: [ 
 		port := self defaultPort ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipServer >> port: anInteger [ 
 	port := anInteger
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 GossipServer >> run [ 
 	socket := Socket newUDP 
 		setPort: self port; 
@@ -72,7 +73,7 @@ GossipServer >> run [
 		named: 'Gossip receiver on port ', self port printString
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 GossipServer >> runLoop [ 
 	| buffer result |
 	[ [ loop ] whileTrue: [
@@ -88,7 +89,7 @@ GossipServer >> runLoop [
 			socket closeAndDestroy ] 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipServer >> stop [ 
 	process ifNotNil: [  
 		process terminate ].

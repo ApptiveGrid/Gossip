@@ -1,64 +1,65 @@
 Class {
-	#name : #GossipEndpointStateDelta,
-	#superclass : #Object,
+	#name : 'GossipEndpointStateDelta',
+	#superclass : 'Object',
 	#instVars : [
 		'heartbeatState',
 		'applicationStates'
 	],
-	#category : #Gossip
+	#category : 'Gossip',
+	#package : 'Gossip'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointStateDelta >> applicationStateAt: aString [ 
 	^ applicationStates 
 		at: aString 
 		ifAbsent: [ KeyNotFound signal: 'state ', aString printString, ' not found' ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointStateDelta >> applicationStates [
 	^ applicationStates
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointStateDelta >> applicationStates: aCollection [ 
 	applicationStates := aCollection
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 GossipEndpointStateDelta >> applyChangesTo: endpointState [ 
 	endpointState heartbeatState updateFrom: heartbeatState.
 	applicationStates keysAndValuesDo: [ :key :value |
 		endpointState applicationStateAt: key overwrite: value ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointStateDelta >> generation [
 	^ self heartbeatState generation
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointStateDelta >> generation: anInteger [ 
 	heartbeatState generation: anInteger 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointStateDelta >> heartbeatState [
 	^ heartbeatState
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipEndpointStateDelta >> heartbeatState: aGossipHeartbeatState [ 
 	heartbeatState := aGossipHeartbeatState
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GossipEndpointStateDelta >> initialize [ 
 	super initialize.
 	applicationStates := Dictionary new
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 GossipEndpointStateDelta >> isEmpty [
 	^ applicationStates isEmpty
 ]

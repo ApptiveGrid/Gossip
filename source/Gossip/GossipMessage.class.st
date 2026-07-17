@@ -1,13 +1,14 @@
 Class {
-	#name : #GossipMessage,
-	#superclass : #Object,
+	#name : 'GossipMessage',
+	#superclass : 'Object',
 	#instVars : [
 		'sender'
 	],
-	#category : #Gossip
+	#category : 'Gossip',
+	#package : 'Gossip'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipMessage >> sender: aGossipEndpoint [ 
 	sender := aGossipEndpoint 
 ]

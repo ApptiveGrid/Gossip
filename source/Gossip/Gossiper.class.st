@@ -1,6 +1,6 @@
 Class {
-	#name : #Gossiper,
-	#superclass : #Object,
+	#name : 'Gossiper',
+	#superclass : 'Object',
 	#instVars : [
 		'server',
 		'sender',
@@ -13,44 +13,54 @@ Class {
 	#classInstVars : [
 		'instance'
 	],
-	#category : #Gossip
+	#category : 'Gossip',
+	#package : 'Gossip'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper class >> instance [ 
 	^ instance ifNil: [ 
 		instance := self new ]
 ]
 
-{ #category : #accessing }
+{ #category : 'not defined protocol' }
+Gossiper >> addToList: aKey item: anItem [
+	| holder list |
+	holder := self localEndpointState applicationStateAt: aKey ifAbsentPut: [ GossipApplicationState new ].
+	list := holder value ifNil: [ GossipListValue new ].
+	list add: anItem.
+	self localEndpointState applicationStateAt: aKey put: list
+]
+
+{ #category : 'accessing' }
 Gossiper >> address [
 	^ self server address
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> address: address [ 
 	self server address: address
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> defaultDuration [
 	^ 1 second
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> duration [
 
 	^ duration ifNil: [ 
 		duration := self defaultDuration ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> duration: anObject [
 
 	duration := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> endpoints [
 	^ endpoints ifNil: [ 
 		endpoints := GossipEndpoints new
@@ -58,12 +68,12 @@ Gossiper >> endpoints [
 			yourself ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> generation [
 	^ generation 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 Gossiper >> gossip [
 	| message |
 	self localEndpointState increaseHeartbeat.
@@ -74,18 +84,18 @@ Gossiper >> gossip [
 		self sendMessage: message to: endpoint  ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 Gossiper >> initialize [ 
 	super initialize.
 	generation := (Time microsecondClockValue / 1000) rounded .
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> localEndpoint [
 	^ self server endpoint
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> localEndpointState [
 	^ self endpoints 
 		endpointStateAt: self localEndpoint
@@ -97,7 +107,7 @@ Gossiper >> localEndpointState [
 				yourself  ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 Gossiper >> log: aString [ 
 	Transcript 
 		show: self localEndpoint asString;
@@ -106,28 +116,28 @@ Gossiper >> log: aString [
 		cr
 ]
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 Gossiper >> newMessage: aClass [ 
 	^ aClass new
 		sender: self localEndpoint
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> port: anInteger [ 
 	self server port: anInteger 
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 Gossiper >> printOn: aStream [ 
 	aStream << 'gossiper: ' << self localEndpoint asString
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 Gossiper >> randomNodes [
 	^ self seedNodes copyWithout: self localEndpoint
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 Gossiper >> received: aString from: endpoint [
 	self 
 		receivedMessage: (STON fromString: aString) 
@@ -135,35 +145,44 @@ Gossiper >> received: aString from: endpoint [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 Gossiper >> receivedMessage: aMessage from: endpoint [
 	aMessage processIn: self
 ]
 
-{ #category : #accessing }
+{ #category : 'not defined protocol' }
+Gossiper >> removeFromList: aKey item: anItem [
+	| holder list |
+	holder := self localEndpointState applicationStateAt: aKey ifAbsentPut: [ GossipApplicationState new ].
+	list := holder value ifNil: [ GossipListValue new ].
+	list remove: anItem.
+	self localEndpointState applicationStateAt: aKey put: list
+]
+
+{ #category : 'accessing' }
 Gossiper >> run [
 	process ifNotNil: [ process terminate ].
 	process := [ self runLoop ] forkNamed: self localEndpoint printString, ' gossiper loop'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> runLoop [
 	[ self gossip.
 		self duration wait ] repeat
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> seedNodes [
 	^ seedNodes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> seedNodes: aCollection [ 
 	seedNodes := aCollection
 ]
 
-{ #category : #'utilities - objectiveC' }
+{ #category : 'utilities - objectiveC' }
 Gossiper >> sendMessage: aGossipSimpleMessage to: endpoint [
 	self
 		sendMessage: aGossipSimpleMessage 
@@ -171,7 +190,7 @@ Gossiper >> sendMessage: aGossipSimpleMessage to: endpoint [
 		port: endpoint port 
 ]
 
-{ #category : #'utilities - objectiveC' }
+{ #category : 'utilities - objectiveC' }
 Gossiper >> sendMessage: aGossipSimpleMessage toAdress: aCollection port: anInteger [ 
 	self sender 
 		sendMessage: aGossipSimpleMessage 
@@ -179,7 +198,7 @@ Gossiper >> sendMessage: aGossipSimpleMessage toAdress: aCollection port: anInte
 		port: anInteger 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> sender [
 	^ sender ifNil: [ 
 		sender := GossipSender new
@@ -187,7 +206,7 @@ Gossiper >> sender [
 			yourself  ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> server [ 
 	^ server ifNil: [
 		server := GossipServer new 
@@ -195,18 +214,18 @@ Gossiper >> server [
 			yourself ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> start [ 
 	self server run.
 	self run
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> stateAt: aString [ 
 	^ (self localEndpoint stateAt: aString) value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> stateAt: key put: value [
 	| valueHolder |
 	valueHolder := self localEndpoint 
@@ -216,7 +235,7 @@ Gossiper >> stateAt: key put: value [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 Gossiper >> stop [
 	server ifNotNil: [  
 		server stop ].

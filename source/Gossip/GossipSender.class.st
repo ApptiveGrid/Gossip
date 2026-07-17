@@ -1,6 +1,6 @@
 Class {
-	#name : #GossipSender,
-	#superclass : #Object,
+	#name : 'GossipSender',
+	#superclass : 'Object',
 	#instVars : [
 		'gossiper',
 		'socket'
@@ -8,27 +8,28 @@ Class {
 	#classInstVars : [
 		'instance'
 	],
-	#category : #Gossip
+	#category : 'Gossip',
+	#package : 'Gossip'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipSender class >> instance [ 
 	^ instance ifNil: [ 
 		instance := self new ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipSender >> gossiper: aGossiper [ 
 	gossiper := aGossiper
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 GossipSender >> initialize [ 
 	super initialize.
 	socket := Socket newUDP.
 ]
 
-{ #category : #'utilities - objectiveC' }
+{ #category : 'utilities - objectiveC' }
 GossipSender >> sendMessage: aMessage to: endpoint [ 
 	self 
 		sendMessage: aMessage 
@@ -36,7 +37,7 @@ GossipSender >> sendMessage: aMessage to: endpoint [
 		port: endpoint port 
 ]
 
-{ #category : #'utilities - objectiveC' }
+{ #category : 'utilities - objectiveC' }
 GossipSender >> sendMessage: aMessage toAdress: address port: port [ 
 	gossiper log: 'sending ', aMessage class name, ' to ', address asSocketAddress printString, ':', port asString.
 	socket 
@@ -46,7 +47,7 @@ GossipSender >> sendMessage: aMessage toAdress: address port: port [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GossipSender >> stop [
 	socket closeAndDestroy 
 ]
