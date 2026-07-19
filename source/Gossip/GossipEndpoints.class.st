@@ -73,12 +73,7 @@ GossipEndpoints >> endpointStateAt: endpoint overwrite: aGossipEndpointState [
 
 { #category : 'accessing' }
 GossipEndpoints >> endpointStateAt: key put: value [
-	| valueHolder |
-	valueHolder := self localEndpoint 
-		stateAt: key
-		ifAbsentPut: [ GossipApplicationState new ].
-	valueHolder setValue: value endpointState: self
-	
+	self localEndpointState applicationStateAt: key put: value
 ]
 
 { #category : 'accessing' }
