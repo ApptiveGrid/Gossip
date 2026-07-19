@@ -9,11 +9,6 @@ Class {
 	#package : 'Gossip'
 }
 
-{ #category : 'initialization' }
-GossipApplicationState >> initializeVersionFrom: aGossipEndpointState [ 
-	self shouldBeImplemented.
-]
-
 { #category : 'accessing' }
 GossipApplicationState >> maxVersion [
 

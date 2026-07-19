@@ -222,17 +222,12 @@ Gossiper >> start [
 
 { #category : 'accessing' }
 Gossiper >> stateAt: aString [ 
-	^ (self localEndpoint stateAt: aString) value
+	^ (self localEndpointState applicationStateAt: aString) value
 ]
 
 { #category : 'accessing' }
 Gossiper >> stateAt: key put: value [
-	| valueHolder |
-	valueHolder := self localEndpoint 
-		stateAt: key
-		ifAbsentPut: [ GossipApplicationState new  ].
-	valueHolder setValue: value endpointState: self localEndpoint 
-	
+	self localEndpointState applicationStateAt: key put: value
 ]
 
 { #category : 'accessing' }
