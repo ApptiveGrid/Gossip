@@ -19,6 +19,12 @@ GossipListValue >> entries [
 	^ entries
 ]
 
+{ #category : 'as yet unclassified' }
+GossipListValue >> gcTombstonesOlderThan: aVersionGap [
+	entries := entries reject: [ :pair | 
+		pair first not and: [ (versionCounter - pair second) > aVersionGap ] ]
+]
+
 { #category : 'not defined protocol' }
 GossipListValue >> includes: anItem [
 	^ (entries at: anItem ifAbsent: [ ^ false ]) first
