@@ -9,7 +9,8 @@ Class {
 		'generation',
 		'process',
 		'duration',
-		'running'
+		'running',
+		'clock'
 	],
 	#classInstVars : [
 		'instance'
@@ -41,6 +42,20 @@ Gossiper >> address [
 { #category : 'accessing' }
 Gossiper >> address: address [ 
 	self server address: address
+]
+
+{ #category : 'accessing' }
+Gossiper >> clock [
+	"Where this image reads the time for 'last seen'. In production the class
+	DateAndTime itself, which already understands now; a test or a simulation puts
+	its own clock here. One clock per reader, never a shared one - that is what
+	keeps clock skew between images representable at all."
+	^ clock ifNil: [ clock := DateAndTime ]
+]
+
+{ #category : 'accessing' }
+Gossiper >> clock: anObject [
+	clock := anObject
 ]
 
 { #category : 'accessing' }
@@ -76,13 +91,17 @@ Gossiper >> generation [
 
 { #category : 'as yet unclassified' }
 Gossiper >> gossip [
-	| message |
-	self localEndpointState increaseHeartbeat.
+	| message state |
+	state := self localEndpointState.
+	state increaseHeartbeat.
+	"This image is seen whenever it speaks, so the answer to 'when last seen' is
+	the same kind of answer for every member, its own entry included."
+	state seenAt: self clock now.
 	message := GossipSynMessage new
-		sender: self localEndpoint;  
+		sender: self localEndpoint;
 		digests: self endpoints digests.
 	self randomNodes do: [ :endpoint |
-		self sendMessage: message to: endpoint  ]
+		self sendMessage: message to: endpoint ]
 ]
 
 { #category : 'initialization' }

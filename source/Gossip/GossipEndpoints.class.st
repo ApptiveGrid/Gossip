@@ -19,16 +19,29 @@ GossipEndpoints class >> instance [
 ]
 
 { #category : 'as yet unclassified' }
-GossipEndpoints >> applyChanges: aDictionary [  
-	| localEndpointState |
-	aDictionary keysAndValuesDo: [ :endpoint :endpointState |
-		localEndpointState := endpointStates 
+GossipEndpoints >> applyChanges: aDictionary [
+	aDictionary keysAndValuesDo: [ :endpoint :endpointState | | local isNew versionBefore |
+		isNew := (endpointStates includesKey: endpoint) not.
+		local := endpointStates
 			at: endpoint
 			ifAbsentPut: [
 				GossipEndpointState new
 					endpoint: endpoint;
 					generation: endpointState heartbeatState generation ].
-		endpointState applyChangesTo: localEndpointState ]
+		versionBefore := local heartbeatState version.
+		endpointState applyChangesTo: local.
+		"Only a heartbeat that moved forward says the node itself is still there.
+		Hearing its state relayed once more, unchanged, says nothing about it - and
+		that is the whole point of the timestamp."
+		(isNew or: [ local heartbeatState version > versionBefore ])
+			ifTrue: [ local seenAt: self clock now ] ]
+]
+
+{ #category : 'accessing' }
+GossipEndpoints >> clock [
+	"The clock of the gossiper these endpoints belong to. Standing on its own -
+	as in the tests that exercise message handling alone - the wall clock does."
+	^ gossiper ifNil: [ DateAndTime ] ifNotNil: [ gossiper clock ]
 ]
 
 { #category : 'accessing' }
