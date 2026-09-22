@@ -8,7 +8,8 @@ Class {
 		'seedNodes',
 		'generation',
 		'process',
-		'duration'
+		'duration',
+		'running'
 	],
 	#classInstVars : [
 		'instance'
@@ -87,6 +88,7 @@ Gossiper >> gossip [
 { #category : 'initialization' }
 Gossiper >> initialize [ 
 	super initialize.
+	running := false.
 	generation := (Time microsecondClockValue / 1000) rounded .
 ]
 
@@ -161,15 +163,16 @@ Gossiper >> removeFromList: aKey item: anItem [
 
 { #category : 'accessing' }
 Gossiper >> run [
+	running := true.
 	process ifNotNil: [ process terminate ].
 	process := [ self runLoop ] forkNamed: self localEndpoint printString, ' gossiper loop'
 ]
 
 { #category : 'accessing' }
 Gossiper >> runLoop [
-	[ self gossip.
-		self duration wait ] repeat
-	
+	[ running ] whileTrue: [
+		self gossip.
+		self duration wait ]
 ]
 
 { #category : 'accessing' }
@@ -232,8 +235,15 @@ Gossiper >> stateAt: key put: value [
 
 { #category : 'accessing' }
 Gossiper >> stop [
-	server ifNotNil: [  
-		server stop ].
-	sender ifNotNil: [ 
-		sender stop ]
+	"Leave the loop before closing the sockets, and make sure no process outlives
+	this call. This used to close the sockets and leave the loop running, so a
+	stopped gossiper kept sending into a destroyed socket every duration - which
+	surfaces much later, and somewhere else, as a TestFailedByForkedProcess in
+	whatever test happens to be running at the time."
+	running := false.
+	process ifNotNil: [ :p |
+		p terminate.
+		process := nil ].
+	server ifNotNil: [ server stop ].
+	sender ifNotNil: [ sender stop ]
 ]
