@@ -9,7 +9,8 @@ Class {
 		'network',
 		'endpointA',
 		'endpointB',
-		'sim'
+		'sim',
+		'router'
 	],
 	#category : 'Gossip-Simulation-Tests',
 	#package : 'Gossip-Simulation-Tests'
@@ -29,7 +30,8 @@ GossipDevsHardeningTest >> setUp [
 	serverA := DEVSPluggableServer new name: #serverA; port: 1; yourself.
 	serverB := DEVSPluggableServer new name: #serverB; port: 1; yourself.
 
-	network := DEVSNetwork new name: #net.
+	network := DEVSNetwork new name: #net; yourself.
+	router := network router: DEVSFaultInjectingNetworkRouter new.
 	network addHost: (DEVSNetworkHost new
 		name: #hostA;
 		address: '9001';
@@ -71,6 +73,23 @@ GossipDevsHardeningTest >> testEndpointsConverge [
 	gossA gossip.
 	gossB gossip.
 	self runSimulationFor: 30.
+	self assert: (gossA endpoints includesKey: endpointB).
+	self assert: (gossB endpoints includesKey: endpointA)
+]
+
+{ #category : 'tests' }
+GossipDevsHardeningTest >> testEndpointsConvergeDespiteADroppedMessage [
+	"That both DEVS worlds are now one is what this test shows: a Gossip model
+	running on the fault injection that used to live in Rhizome.
+	A counted drop is used rather than a partition because the recovery has to
+	happen inside a single run - the solver cannot be resumed yet, which is
+	exactly what makes heal-after-partition a later step."
+	router dropNextNMessagesBetween: '9001' and: '9002' count: 1.
+	gossA gossip.
+	gossB gossip.
+	gossA gossip.
+	gossB gossip.
+	self runSimulationFor: 60.
 	self assert: (gossA endpoints includesKey: endpointB).
 	self assert: (gossB endpoints includesKey: endpointA)
 ]
