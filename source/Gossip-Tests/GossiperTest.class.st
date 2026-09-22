@@ -16,6 +16,12 @@ GossiperTest >> setUp [
 		start
 ]
 
+{ #category : 'running' }
+GossiperTest >> tearDown [
+	gossiper stop.
+	super tearDown
+]
+
 { #category : 'tests' }
 GossiperTest >> testReceiveAckOnSyn [
 	| message |
