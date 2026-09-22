@@ -5,7 +5,8 @@ Class {
 		'heartbeatState',
 		'applicationStates',
 		'maxVersion',
-		'endpoint'
+		'endpoint',
+		'lastSeen'
 	],
 	#category : 'Gossip',
 	#package : 'Gossip'
@@ -109,6 +110,17 @@ GossipEndpointState >> isEmpty [
 ]
 
 { #category : 'accessing' }
+GossipEndpointState >> lastSeen [
+	"When this image last saw this endpoint's own heartbeat move forward, or nil
+	if it never has. Purely local knowledge: it is not part of what travels, and
+	two images will not answer the same thing.
+
+	It is an observation, not a judgement - nothing here decides whether the node
+	is gone. See Rhizome decisions of 2026-09-22."
+	^ lastSeen
+]
+
+{ #category : 'accessing' }
 GossipEndpointState >> maxVersion [
 	^ maxVersion 
 ]
@@ -154,4 +166,9 @@ GossipEndpointState >> processDigest: digest forMessage: message [
 				between the remote version and our local one"
 				"delta at: endpointState endpoint put: (endpointState applicationStatesAfterVersion: digest version)"
 				message updateEndpoint: digest endpoint with: (self applicationStatesAfterVersion: digest version) ] ] 
+]
+
+{ #category : 'accessing' }
+GossipEndpointState >> seenAt: aTime [
+	lastSeen := aTime
 ]
