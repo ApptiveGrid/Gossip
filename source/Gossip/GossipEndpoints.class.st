@@ -19,22 +19,52 @@ GossipEndpoints class >> instance [
 ]
 
 { #category : 'as yet unclassified' }
-GossipEndpoints >> applyChanges: aDictionary [
-	aDictionary keysAndValuesDo: [ :endpoint :endpointState | | local isNew versionBefore |
-		isNew := (endpointStates includesKey: endpoint) not.
+GossipEndpoints >> apply: aDelta to: anEndpoint [
+	"What has arrived about one endpoint - which is not always about the same
+	incarnation of it. An image draws a new generation every time it starts, so a
+	neighbour that has restarted sends a higher one than the one held here. That is a
+	new incarnation: what is held is gone, and the state is replaced rather than
+	merged. A lower generation is an older incarnation still travelling and is
+	dropped. Only inside one generation are the two merged, which is what the
+	heartbeat's version is for.
+
+	The digest side has known this all along - GossipEndpointState>>processDigest:forMessage:
+	asks for a complete refresh when it sees a higher generation. This side signalled
+	'generation mismatch' instead, which cost the delta that had just arrived and put
+	a walkback in every neighbour's log on every restart. Found on alpha on
+	2026-09-23, where a deploy restarts all five images at once."
+
+	| local known isNew versionBefore |
+	local := endpointStates at: anEndpoint ifAbsent: [ nil ].
+	known := local ifNotNil: [ :each | each generation ].
+	"A state built here and never heard from carries no generation; those do not
+	travel, so an incoming one without a generation is this same incarnation."
+	(known notNil and: [ aDelta generation notNil ]) ifTrue: [
+		aDelta generation < known ifTrue: [ ^ self ] ].
+	isNew := known isNil or: [
+		         aDelta generation notNil and: [ aDelta generation > known ] ].
+	isNew ifTrue: [
 		local := endpointStates
-			at: endpoint
-			ifAbsentPut: [
-				GossipEndpointState new
-					endpoint: endpoint;
-					generation: endpointState heartbeatState generation ].
-		versionBefore := local heartbeatState version.
-		endpointState applyChangesTo: local.
-		"Only a heartbeat that moved forward says the node itself is still there.
-		Hearing its state relayed once more, unchanged, says nothing about it - and
-		that is the whole point of the timestamp."
-		(isNew or: [ local heartbeatState version > versionBefore ])
-			ifTrue: [ local seenAt: self clock now ] ]
+			         at: anEndpoint
+			         put: (GossipEndpointState new
+					          endpoint: anEndpoint;
+					          generation: aDelta generation;
+					          yourself) ].
+	versionBefore := local heartbeatState version.
+	aDelta applyChangesTo: local.
+	"Only a heartbeat that moved forward says the node itself is still there.
+	Hearing its state relayed once more, unchanged, says nothing about it - and that
+	is the whole point of the timestamp. A new incarnation counts as movement: it
+	starts counting from one again, so its version says nothing, but the node itself
+	is demonstrably there."
+	(isNew or: [ local heartbeatState version > versionBefore ])
+		ifTrue: [ local seenAt: self clock now ]
+]
+
+{ #category : 'as yet unclassified' }
+GossipEndpoints >> applyChanges: aDictionary [
+	aDictionary keysAndValuesDo: [ :endpoint :delta |
+		self apply: delta to: endpoint ]
 ]
 
 { #category : 'accessing' }
