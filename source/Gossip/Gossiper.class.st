@@ -148,6 +148,14 @@ Gossiper >> port: anInteger [
 	self server port: anInteger 
 ]
 
+{ #category : 'accessing' }
+Gossiper >> publishedPort: anInteger [ 
+	"What the others are told to answer to, when that is not the port the socket
+	binds. See GossipServer>>publishedPort."
+
+	self server publishedPort: anInteger
+]
+
 { #category : 'printing' }
 Gossiper >> printOn: aStream [ 
 	aStream << 'gossiper: ' << self localEndpoint asString
