@@ -79,7 +79,9 @@ GossipEndpoints >> endpointStateAt: key ifAbsentPut: aBlock [
 
 { #category : 'accessing' }
 GossipEndpoints >> endpointStateAt: endpoint overwrite: aGossipEndpointState [ 
-	gossiper log: 'updating ', endpoint asString.
+	"Silent for the same reason as GossipSender: every round updates every
+	endpoint it hears about, so this said nothing except that gossip is running."
+
 	aGossipEndpointState isEmpty ifFalse: [  
 	endpointStates at: endpoint put: aGossipEndpointState ]
 ]
