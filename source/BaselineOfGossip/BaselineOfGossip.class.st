@@ -19,6 +19,11 @@ BaselineOfGossip >> baseline: spec [
 
 			spec
 				group: 'default' with: #('Core' 'Simulation');
+				"What an image takes that only has to speak the protocol. Every other
+				group here carries tests: Core brings Gossip-Tests, and default brings
+				Simulation on top, which requires PharoDEVS - so a deployed image asking
+				for any of them would get a simulator with it."
+				group: 'Runtime' with: #('Gossip');
 				group: 'Core' with: #('Gossip' 'Gossip-Tests');
 				group: 'Simulation' with: #('Gossip-Simulation-Tests') ].
 ]
