@@ -39,7 +39,12 @@ GossipSender >> sendMessage: aMessage to: endpoint [
 
 { #category : 'utilities - objectiveC' }
 GossipSender >> sendMessage: aMessage toAdress: address port: port [ 
-	gossiper log: 'sending ', aMessage class name, ' to ', address asSocketAddress printString, ':', port asString.
+	"Not a line per message. A round goes to three images every second, and each
+	syn it answers costs an ack and each ack an ack2 - which on a deployment of
+	five images is of the order of a million lines a day, through the transcript
+	and out to the log host. What comes up and what goes down is still said; what
+	travels is not."
+
 	socket 
 		sendUDPData: (STON toString: aMessage)
 	 	toHost: address  
