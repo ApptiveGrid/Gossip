@@ -104,9 +104,8 @@ GossipRestartTest >> testARestartReplacesWhatWasHeld [
 	there localEndpointState applicationStateAt: 'gone' put: #yes.
 	self tell: there.
 	self tell: self restartOfThere.
-	self
-		assert: (self stateOfThere applicationStateAt: 'gone' ifAbsent: [ nil ])
-		equals: nil
+	self deny:
+		(self stateOfThere allStates applicationStates includesKey: 'gone')
 ]
 
 { #category : 'tests' }
