@@ -153,9 +153,48 @@ Gossiper >> printOn: aStream [
 	aStream << 'gossiper: ' << self localEndpoint asString
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'gossiping' }
+Gossiper >> gossipTargetCount [
+	"How many images this one speaks to in a round. Three, whatever the cluster
+	knows: what a round costs has to stay flat while the membership grows, and that
+	is the whole point of gossip."
+
+	^ 3
+]
+
+{ #category : 'gossiping' }
 Gossiper >> randomNodes [
-	^ self seedNodes copyWithout: self localEndpoint
+	"Whom this image talks to in this round: three at random out of everything it
+	has learned, with a seed always among them.
+
+	The seeds are the way in, not the conversation. Before anything is learned they
+	are the only candidates there are; afterwards they are candidates like any
+	other, and the one guarantee kept on top is that a seed is always in the set.
+	That is what carries a returning image back into a cluster, and what keeps two
+	halves that have only heard of each other through a third from drifting apart.
+
+	This used to answer the seed list and nothing else, so an image spoke only ever
+	to its seeds no matter how many members it knew. It did not show while every
+	image seeded every other one; it shows the moment the seeds are a chosen few.
+
+	A seed is put in place of one of the three rather than added to them: the set
+	stays three however many members there are."
+
+	| seeds candidates chosen |
+	seeds := (self seedNodes ifNil: [ #(  ) ]) reject: [ :each |
+		         each = self localEndpoint ].
+	candidates := Set new.
+	candidates
+		addAll: self endpoints keys;
+		addAll: seeds;
+		remove: self localEndpoint ifAbsent: [  ].
+	candidates isEmpty ifTrue: [ ^ #(  ) ].
+	chosen := (candidates asArray shuffled first:
+		           (self gossipTargetCount min: candidates size)) asOrderedCollection.
+	(seeds isEmpty or: [
+		 chosen anySatisfy: [ :each | seeds includes: each ] ]) ifFalse: [
+		chosen at: chosen size put: seeds atRandom ].
+	^ chosen
 ]
 
 { #category : 'as yet unclassified' }
