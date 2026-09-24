@@ -3,7 +3,8 @@ Class {
 	#superclass : 'Gossiper',
 	#instVars : [
 		'receivedMessages',
-		'sentMessages'
+		'sentMessages',
+		'loggedLines'
 	],
 	#category : 'Gossip-Tests',
 	#package : 'Gossip-Tests'
@@ -18,7 +19,21 @@ TestGossiper >> hasReceivedMessages [
 TestGossiper >> initialize [ 
 	super initialize.
 	receivedMessages := OrderedCollection new.
-	sentMessages := OrderedCollection new
+	sentMessages := OrderedCollection new.
+	loggedLines := OrderedCollection new
+]
+
+{ #category : 'logging' }
+TestGossiper >> log: aString [
+	"Kept rather than written out. A test that wants to know what was said can read
+	it here, and the ones that do not are spared the Transcript."
+
+	loggedLines add: aString
+]
+
+{ #category : 'logging' }
+TestGossiper >> loggedLines [
+	^ loggedLines
 ]
 
 { #category : 'as yet unclassified' }
