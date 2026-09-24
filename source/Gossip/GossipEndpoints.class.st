@@ -18,6 +18,22 @@ GossipEndpoints class >> instance [
 		instance := self new ]
 ]
 
+{ #category : 'accessing' }
+GossipEndpoints >> applicationValuesOf: anEndpointStateOrNil [
+	"The plain values this image holds for one endpoint, keyed the way a delta is
+	keyed. Read before the delta is applied, so that afterwards the two can be
+	compared - which is the point of taking it at all: a delta names every key it
+	carries, moved or not, so logging on arrival rather than on change would put
+	back the line per message that was taken out on 2026-09-23."
+
+	| values |
+	values := Dictionary new.
+	anEndpointStateOrNil ifNil: [ ^ values ].
+	anEndpointStateOrNil allStates applicationStates keysAndValuesDo: [ :key :each |
+		values at: key put: each value ].
+	^ values
+]
+
 { #category : 'as yet unclassified' }
 GossipEndpoints >> apply: aDelta to: anEndpoint [
 	"What has arrived about one endpoint - which is not always about the same
@@ -34,7 +50,7 @@ GossipEndpoints >> apply: aDelta to: anEndpoint [
 	a walkback in every neighbour's log on every restart. Found on alpha on
 	2026-09-23, where a deploy restarts all five images at once."
 
-	| local known isNew versionBefore |
+	| local known isNew valuesBefore versionBefore |
 	local := endpointStates at: anEndpoint ifAbsent: [ nil ].
 	known := local ifNotNil: [ :each | each generation ].
 	"A state built here and never heard from carries no generation; those do not
@@ -43,7 +59,9 @@ GossipEndpoints >> apply: aDelta to: anEndpoint [
 		aDelta generation < known ifTrue: [ ^ self ] ].
 	isNew := known isNil or: [
 		         aDelta generation notNil and: [ aDelta generation > known ] ].
+	valuesBefore := self applicationValuesOf: local.
 	isNew ifTrue: [
+		self logIncarnationOf: anEndpoint from: known to: aDelta generation.
 		local := endpointStates
 			         at: anEndpoint
 			         put: (GossipEndpointState new
@@ -52,6 +70,7 @@ GossipEndpoints >> apply: aDelta to: anEndpoint [
 					          yourself) ].
 	versionBefore := local heartbeatState version.
 	aDelta applyChangesTo: local.
+	self logChangesOf: anEndpoint in: aDelta against: valuesBefore.
 	"Only a heartbeat that moved forward says the node itself is still there.
 	Hearing its state relayed once more, unchanged, says nothing about it - and that
 	is the whole point of the timestamp. A new incarnation counts as movement: it
@@ -155,6 +174,46 @@ GossipEndpoints >> keysAndValuesDo: aBlock [
 { #category : 'accessing' }
 GossipEndpoints >> localEndpointState [
 	^ self endpointStateAt: gossiper localEndpoint
+]
+
+{ #category : 'logging' }
+GossipEndpoints >> log: aString [
+	"Through the gossiper, which owns the channel. Standing on its own - as in the
+	tests that exercise message handling alone - there is nobody to tell."
+
+	gossiper ifNotNil: [ :each | each log: aString ]
+]
+
+{ #category : 'logging' }
+GossipEndpoints >> logChangesOf: anEndpoint in: aDelta against: oldValues [
+	"One line for every application value that actually moved, and nothing for the
+	rest. The comparison is what makes this rare enough to be worth reading: at rest
+	the cluster says nothing at all, and a line means something happened."
+
+	aDelta applicationStates keysAndValuesDo: [ :key :each |
+		(oldValues includesKey: key)
+			ifFalse: [
+				self log: anEndpoint asString , ' announces ' , key asString , ' = '
+					, each value printString ]
+			ifTrue: [
+				(oldValues at: key) = each value ifFalse: [
+					self log: anEndpoint asString , ' changes ' , key asString , ' from '
+						, (oldValues at: key) printString , ' to ' , each value printString ] ] ]
+]
+
+{ #category : 'logging' }
+GossipEndpoints >> logIncarnationOf: anEndpoint from: aGeneration to: aNewGeneration [
+	"Two events that look the same by the time the state has been replaced: an
+	endpoint nobody here had heard of, and one that was here and has come back as a
+	different incarnation of itself. The second is the one worth seeing on a deploy."
+
+	aGeneration
+		ifNil: [
+			self log: 'new endpoint ' , anEndpoint asString , ', generation '
+				, aNewGeneration printString ]
+		ifNotNil: [
+			self log: anEndpoint asString , ' restarted, generation '
+				, aGeneration printString , ' -> ' , aNewGeneration printString ]
 ]
 
 { #category : 'instance creation' }
