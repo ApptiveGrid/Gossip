@@ -61,3 +61,16 @@ GossipLogChannelTest >> testTheLineNamesWhoSpoke [
 	self assert: (logger signals first message beginsWith:
 			 gossiper localEndpoint asString , ': ')
 ]
+
+{ #category : 'tests' }
+GossipLogChannelTest >> testTheLineLeavesTheTimestampToTheLog [
+	"Beacon's default one-line form starts with the signal's own timestamp. Where
+	these lines end up - a log with a syslog driver in front of it - the date is
+	already there, and printing it again puts two of them in one line."
+
+	| line |
+	line := (GossipSignal new
+		         message: '10.10.0.6:3601: new endpoint 10.10.0.7:3601';
+		         yourself) printString.
+	self assert: line equals: 'GossipSignal 10.10.0.6:3601: new endpoint 10.10.0.7:3601'
+]
