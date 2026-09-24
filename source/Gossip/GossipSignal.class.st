@@ -8,22 +8,44 @@ What gets said is deliberately rare - see GossipEndpoints for which events earn 
 Class {
 	#name : 'GossipSignal',
 	#superclass : 'StringSignal',
+	#classInstVars : [
+		'printsTimestamp'
+	],
 	#category : 'Gossip',
 	#package : 'Gossip'
 }
 
+{ #category : 'accessing' }
+GossipSignal class >> printsTimestamp [
+	"Whether the one-line form begins with the signal's own timestamp, the way
+	BeaconSignal's does. True unless someone says otherwise, so an image that does
+	nothing gets Beacon's behaviour and nothing here surprises it."
+
+	^ printsTimestamp ifNil: [ printsTimestamp := true ]
+]
+
+{ #category : 'accessing' }
+GossipSignal class >> printsTimestamp: aBoolean [
+	"Set this to false where the log already stamps its own time - a container
+	behind docker's syslog driver, for instance, whose lines arrive with date, host
+	and container in front of them. Then one date per line instead of two.
+
+	It is the printed form that changes, never the signal: the timestamp stays on
+	the object either way, for anyone reading it as data rather than as text."
+
+	printsTimestamp := aBoolean
+]
+
 { #category : 'printing' }
 GossipSignal >> printOneLineOn: aStream [
-	"Without the timestamp BeaconSignal puts in front. These lines are written to be
-	read in a log, and a log stamps its own time: on alpha the containers run with
-	docker's syslog driver, so every line already arrives with date, host and
-	container in front of it. A second timestamp in the middle of that is noise. The
-	time is still on the signal for anyone reading it as an object.
+	"Both forms are wanted, so the timestamp is a switch rather than a decision made
+	here - see printsTimestamp:. The class name is not: several kinds of signal land
+	in the same stream, and it is what says which one spoke."
 
-	The class name stays. Several kinds of signal land in the same stream, and it is
-	what says which one spoke - AGSignal on the ApptiveGrid side drops the timestamp
-	the same way, but leaves nothing in its place except two numbers."
-
+	self class printsTimestamp ifTrue: [
+		aStream
+			nextPutAll: self timestamp asString;
+			space ].
 	aStream
 		nextPutAll: self class name;
 		space.
