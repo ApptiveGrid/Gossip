@@ -18,12 +18,30 @@ Class {
 }
 
 { #category : 'running' }
+GossipLogChannelTest >> aLine [
+	^ GossipSignal new
+		  message: '10.10.0.6:3601: new endpoint 10.10.0.7:3601';
+		  yourself
+]
+
+{ #category : 'running' }
 GossipLogChannelTest >> setUp [
 	super setUp.
 	gossiper := Gossiper new
 		            address: #[ 127 0 0 1 ];
 		            port: 9001;
 		            yourself
+]
+
+{ #category : 'running' }
+GossipLogChannelTest >> withTimestamp: aBoolean do: aBlock [
+	"Class-side state in an image several tests share, so it goes back where it was
+	whatever the block does."
+
+	| before |
+	before := GossipSignal printsTimestamp.
+	GossipSignal printsTimestamp: aBoolean.
+	[ aBlock value ] ensure: [ GossipSignal printsTimestamp: before ]
 ]
 
 { #category : 'tests' }
@@ -60,4 +78,43 @@ GossipLogChannelTest >> testTheLineNamesWhoSpoke [
 	logger runFor: GossipSignal during: [ gossiper log: 'something happened' ].
 	self assert: (logger signals first message beginsWith:
 			 gossiper localEndpoint asString , ': ')
+]
+
+{ #category : 'tests' }
+GossipLogChannelTest >> testTheTimestampCanBeLeftToTheLog [
+	"Where the line ends up in a log that stamps its own time - a container behind
+	docker's syslog driver, whose lines already carry date, host and container - a
+	second date in the middle is noise. The switch takes it out; the class name
+	stays, because it says which kind of signal spoke."
+
+	self
+		withTimestamp: false
+		do: [
+			self
+				assert: self aLine printString
+				equals: 'GossipSignal 10.10.0.6:3601: new endpoint 10.10.0.7:3601' ]
+]
+
+{ #category : 'tests' }
+GossipLogChannelTest >> testTheTimestampIsThereUnlessAsked [
+	"Beacon's own behaviour is what an image gets for doing nothing. Whoever wants
+	it gone says so."
+
+	self
+		withTimestamp: true
+		do: [ | line |
+			line := self aLine.
+			self assert: (line printString beginsWith: line timestamp asString) ]
+]
+
+{ #category : 'tests' }
+GossipLogChannelTest >> testTheValueIsRestoredAfterwards [
+	"The switch is class-side state in a shared image, so a test that moves it and
+	leaves it moved poisons whatever runs next. This one asserts the setUp/tearDown
+	pair actually puts it back."
+
+	| before |
+	before := GossipSignal printsTimestamp.
+	self withTimestamp: before not do: [ ].
+	self assert: GossipSignal printsTimestamp equals: before
 ]
