@@ -129,12 +129,16 @@ Gossiper >> localEndpointState [
 ]
 
 { #category : 'private' }
-Gossiper >> log: aString [ 
-	Transcript 
-		show: self localEndpoint asString;
-		show: ': ';
-		show: aString;
-		cr
+Gossiper >> log: aString [
+	"Through Beacon rather than straight onto the Transcript. The Transcript is one
+	possible listener, not the channel itself: an image that wants these lines
+	elsewhere - a file, a collector, nowhere at all - says so by registering a
+	logger, and does not have to reach into Gossip to do it.
+
+	The speaker is named in the line because the listener cannot know it: several
+	gossipers can run in one image, and in the tests here they do."
+
+	GossipSignal emit: self localEndpoint asString , ': ' , aString
 ]
 
 { #category : 'instance creation' }
