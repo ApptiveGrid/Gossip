@@ -32,6 +32,29 @@ GossipServer >> address: aCollection [
 ]
 
 { #category : 'accessing' }
+GossipServer >> bufferSize [
+	"The largest payload a UDP datagram can carry. It is deliberately not a guess at
+	how big a message gets: whatever the cluster grows to, the buffer must not be
+	the thing that cuts a message in half.
+
+	It used to be 4096, and that was a cliff rather than a limit. Measured with one
+	key per member, an ack carrying a full delta is 1344 bytes at five members, 2832
+	at eleven and 4320 at seventeen - so somewhere past sixteen members the first
+	message would have been cut short, and a cut-short message is what ended the
+	receive loop (see #received:from:). Around 248 bytes per member, this holds a
+	cluster of some 260.
+
+	The datagram still has to cross the network in one piece. On the Nebula overlay,
+	whose MTU is 1280, five members already exceed it and IP fragments it - measured
+	on alpha on 2026-09-23, where fragmented datagrams arrive. Losing one fragment
+	loses the whole datagram, which gossip survives by repeating itself every round.
+	Chunking the ack or leaving the single datagram behind stay open; neither is
+	needed to take the cliff away."
+
+	^ 65507
+]
+
+{ #category : 'accessing' }
 GossipServer >> defaultPort [ 
 	^ 1999
 ]
@@ -91,6 +114,32 @@ GossipServer >> publishedPort: anInteger [
 ]
 
 { #category : 'running' }
+GossipServer >> received: aString from: anEndpoint [
+	"One datagram, and nothing that can be wrong with it may stop the loop. This used
+	to run inside the whileTrue: with nothing catching: a single message that did not
+	parse - which is exactly what a datagram larger than the buffer becomes - left the
+	loop through the ensure:, closed the socket, and ended discovery for this image,
+	silently and for good.
+
+	A datagram that fills the buffer exactly is not parsed at all. What arrived is a
+	prefix, and a prefix of STON is either an error or, worse, a shorter message that
+	parses and says something untrue.
+
+	The error is logged by class and size, never by its text: a STONReaderError
+	carries the whole message it failed on, and putting that in a log is how one bad
+	datagram becomes a megabyte."
+
+	aString size = self bufferSize ifTrue: [
+		^ gossiper log: 'dropped a datagram from ' , anEndpoint printString
+			  , ' that filled the whole buffer - it was cut short' ].
+	[ gossiper received: aString from: anEndpoint ]
+		on: Error
+		do: [ :anError |
+			gossiper log: 'could not read a datagram of ' , aString size printString
+				, ' bytes from ' , anEndpoint printString , ': ' , anError class name ]
+]
+
+{ #category : 'running' }
 GossipServer >> run [ 
 	socket := Socket newUDP 
 		setPort: self port; 
@@ -101,19 +150,23 @@ GossipServer >> run [
 ]
 
 { #category : 'running' }
-GossipServer >> runLoop [ 
+GossipServer >> runLoop [
+	"The buffer is allocated once rather than per datagram, and it is the largest a
+	UDP datagram can be - so that it is never the buffer that decides a message was
+	too big."
+
 	| buffer result |
-	[ [ loop ] whileTrue: [
-		buffer := String new: 4096.
+	buffer := String new: self bufferSize.
+	[
+	[ loop ] whileTrue: [
 		socket waitForData.
 		result := socket receiveUDPDataInto: buffer.
-		gossiper 
-			received:  (buffer copyFrom: 1 to: result first)
-			from: (GossipEndpoint fromUDP: result)
-	 ] ]
-		ensure: [ 
-			Transcript show: 'closing socket on port ', self port printString; cr.
-			socket closeAndDestroy ] 
+		self
+			received: (buffer copyFrom: 1 to: result first)
+			from: (GossipEndpoint fromUDP: result) ] ] ensure: [
+		gossiper ifNotNil: [
+			gossiper log: 'the receiver on port ' , self port printString , ' is stopping' ].
+		socket closeAndDestroy ]
 ]
 
 { #category : 'accessing' }
