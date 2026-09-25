@@ -68,16 +68,15 @@ GossipObserverTest >> testAsksOneNodeARound [
 { #category : 'tests' }
 GossipObserverTest >> testFirstSynAsksForEverything [
 	"Nothing known means an empty digest, and to an empty digest a node answers
-	with every endpoint it holds. The node answers to the sender the syn names,
-	which has no reader of its own - hence instVarNamed:."
+	with every endpoint it holds. It names no sender: that is the request to be
+	answered where it came from. The sender has no reader of its own - hence
+	instVarNamed:."
 
 	| syn |
 	observer gossip.
 	syn := observer sentSyns first key.
 	self assert: syn digests isEmpty.
-	self
-		assert: (syn instVarNamed: #sender)
-		equals: observer localEndpoint
+	self assert: (syn instVarNamed: #sender) isNil
 ]
 
 { #category : 'tests' }

@@ -169,6 +169,17 @@ GossipServer >> runLoop [
 		socket closeAndDestroy ]
 ]
 
+{ #category : 'sending' }
+GossipServer >> send: aString to: anEndpoint [
+	"From the socket this server listens on. See Gossiper>>reply:to: for why that
+	socket and not the sender's."
+
+	socket
+		sendUDPData: aString
+		toHost: anEndpoint address
+		port: anEndpoint port
+]
+
 { #category : 'accessing' }
 GossipServer >> stop [ 
 	process ifNotNil: [  

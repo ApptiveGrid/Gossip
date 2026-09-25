@@ -7,6 +7,8 @@ It gets there by never having an entry of its own. A member learns another only 
 
 One node per round rather than three. There is no fan-out to keep up, and the question is not whether the cluster hears from this one but whether this one hears from the cluster. It stays with a node that answers and moves on to another the first round that brings no answer - which, over UDP, may also be a lost datagram; moving on is cheap, and the next node knows the same.
 
+Its syn names no sender, and that is how it asks to be answered where the question came from (GossipSynMessage>>processIn:from:). Everything it sends leaves from the socket it listens on, so that the answer can come back the way the question went. Behind a NAT - a laptop on a VPN whose gateway translates everything into the cluster's network - that is the only way it is answered at all: the address it knows for itself is not one the cluster can reach.
+
 What it does not avoid: when it moves to a node that is behind it, that node asks in its ack for what it lacks, and the ack2 sent back carries it. That is state of others, replicated anyway, relayed once more - it does not make this one a member.
 "
 Class {
@@ -45,7 +47,6 @@ GossipObserver >> gossip [
 	answered := false.
 	self
 		sendMessage: (GossipSynMessage new
-				 sender: self localEndpoint;
 				 digests: self endpoints digests;
 				 yourself)
 		to: node
@@ -85,6 +86,15 @@ GossipObserver >> node [
 	"The node it currently reads from, nil before the first round."
 
 	^ node
+]
+
+{ #category : 'gossiping' }
+GossipObserver >> sendMessage: aGossipMessage to: anEndpoint [
+	"Out of the socket it listens on, whatever it sends: the syn, so that the
+	answer comes back to where it waits, and the ack2, which follows the same way
+	through whatever translated the first."
+
+	self reply: aGossipMessage to: anEndpoint
 ]
 
 { #category : 'gossiping' }

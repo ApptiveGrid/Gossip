@@ -231,7 +231,17 @@ Gossiper >> received: aString from: endpoint [
 
 { #category : 'as yet unclassified' }
 Gossiper >> receivedMessage: aMessage from: endpoint [
-	aMessage processIn: self
+	aMessage processIn: self from: endpoint
+]
+
+{ #category : 'utilities - objectiveC' }
+Gossiper >> reply: aGossipMessage to: anEndpoint [
+	"Out of the socket this gossiper listens on, not the one it sends from. An answer
+	to where a message came from has to leave the way that message arrived: a
+	gateway that translated the question lets back only what comes from the
+	address and port the question went to."
+
+	self server send: (STON toString: aGossipMessage) to: anEndpoint
 ]
 
 { #category : 'not defined protocol' }
