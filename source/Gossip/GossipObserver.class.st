@@ -73,8 +73,9 @@ GossipObserver >> nextNode [
 	to stop trying it."
 
 	| others |
-	others := self candidateNodes.
-	others remove: node ifAbsent: [  ].
+	"node asks, not the candidates: before the first round it is nil, and
+	GossipEndpoint>>= sends #address to whatever it is compared with."
+	others := self candidateNodes reject: [ :each | node = each ].
 	others isEmpty ifTrue: [ ^ node ].
 	^ others atRandom
 ]
