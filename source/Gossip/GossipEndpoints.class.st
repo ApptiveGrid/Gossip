@@ -161,6 +161,14 @@ GossipEndpoints >> isEmpty [
 	^ endpointStates isEmpty
 ]
 
+{ #category : 'logging' }
+GossipEndpoints >> isListLike: aValue [
+	"A value that is worth saying as a difference rather than in full. A String is a
+	collection and is not one of these."
+
+	^ aValue isCollection and: [ aValue isString not ]
+]
+
 { #category : 'accessing' }
 GossipEndpoints >> keys [
 	^ endpointStates keys
@@ -194,11 +202,20 @@ GossipEndpoints >> logChangesOf: anEndpoint in: aDelta against: oldValues [
 		(oldValues includesKey: key)
 			ifFalse: [
 				self log: anEndpoint asString , ' announces ' , key asString , ' = '
-					, each value printString ]
+					, (self said: each value against: nil) ]
 			ifTrue: [
 				(oldValues at: key) = each value ifFalse: [
-					self log: anEndpoint asString , ' changes ' , key asString , ' from '
-						, (oldValues at: key) printString , ' to ' , each value printString ] ] ]
+					self log: anEndpoint asString , ' changes ' , key asString , ' '
+						, (self said: each value against: (oldValues at: key)) ] ] ]
+]
+
+{ #category : 'logging' }
+GossipEndpoints >> logDifferenceLimit [
+	"How many comings and goings a single line carries before it says how many more
+	there were. Eight, because a line has to stay readable in a syslog - and because
+	a difference longer than that is not a change one reads item by item anyway."
+
+	^ 8
 ]
 
 { #category : 'logging' }
@@ -268,4 +285,38 @@ GossipEndpoints >> processDigestsAndState: digestList forMessage: ack2Message [
 { #category : 'as yet unclassified' }
 GossipEndpoints >> processSynMessage: ackMessage for: ack2Message [ 
 	self processDigestsAndState: ackMessage digests forMessage: ack2Message
+]
+
+{ #category : 'logging' }
+GossipEndpoints >> said: aValue against: anOldValueOrNil [
+	"How a value is put into a line. A scalar is said outright, the old one and the
+	new one, which is what this log has always done and reads best for a type or an
+	endpoint.
+
+	A collection is said as a **difference**, because printing both sides in full is
+	how a log turns into a wall: an image that publishes the databases it holds open
+	would print the whole set twice on every open and every close, on every member
+	that hears it. What is wanted there is what came and what went, and at rest
+	nothing is printed at all because nothing moved.
+
+	Long differences are cut off. A member that comes back publishes everything it
+	has at once, and that line should stay a line."
+
+	| old added removed parts |
+	(self isListLike: aValue) ifFalse: [
+		^ anOldValueOrNil
+			  ifNil: [ aValue printString ]
+			  ifNotNil: [ 'from ' , anOldValueOrNil printString , ' to '
+				  , aValue printString ] ].
+	old := (self isListLike: anOldValueOrNil)
+		       ifTrue: [ anOldValueOrNil asArray ]
+		       ifFalse: [ #(  ) ].
+	added := aValue asArray reject: [ :each | old includes: each ].
+	removed := old reject: [ :each | aValue includes: each ].
+	parts := (added collect: [ :each | '+' , each printString ])
+	         , (removed collect: [ :each | '-' , each printString ]).
+	parts size > self logDifferenceLimit ifTrue: [
+		^ (' ' join: (parts first: self logDifferenceLimit)) , ' and '
+		  , (parts size - self logDifferenceLimit) printString , ' more' ].
+	^ ' ' join: parts
 ]

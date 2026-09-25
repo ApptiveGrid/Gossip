@@ -182,3 +182,59 @@ GossipStateChangeLogTest >> testTheHeartbeatAloneIsSilent [
 		self tell: there ].
 	self assertEmpty: (self loggedSince: mark)
 ]
+
+{ #category : 'tests' }
+GossipStateChangeLogTest >> testALongDifferenceIsCutOff [
+	"A member that comes back publishes everything it has at once. That is one
+	event, and it has to stay one line."
+
+	| mark |
+	there localEndpointState applicationStateAt: 'databases.open' put: #(  ).
+	self tell: there.
+	mark := self mark.
+	there localEndpointState
+		applicationStateAt: 'databases.open'
+		put: ((1 to: 20) collect: [ :each | 'db' , each printString ]).
+	self tell: there.
+	self assert: ((self loggedSince: mark) anySatisfy: [ :each |
+			 each includesSubstring: 'and 12 more' ])
+]
+
+{ #category : 'tests' }
+GossipStateChangeLogTest >> testAScalarIsStillSaidInFull [
+	"The difference is for collections. A type or an endpoint is one value, and
+	reading it means reading where it came from and where it went."
+
+	| mark |
+	there localEndpointState applicationStateAt: 'type' put: #base.
+	self tell: there.
+	mark := self mark.
+	there localEndpointState applicationStateAt: 'type' put: #account.
+	self tell: there.
+	self assert: ((self loggedSince: mark) anySatisfy: [ :each |
+			 each includesSubstring: 'from #base to #account' ])
+]
+
+{ #category : 'tests' }
+GossipStateChangeLogTest >> testAlistIsSaidAsWhatCameAndWent [
+	"The whole point: an image publishing what it holds open would otherwise print
+	the entire set twice on every open and every close, on every member that hears
+	it. What is wanted is the difference."
+
+	| mark lines |
+	there localEndpointState
+		applicationStateAt: 'databases.open'
+		put: #( 'aaa' 'bbb' ).
+	self tell: there.
+	mark := self mark.
+	there localEndpointState
+		applicationStateAt: 'databases.open'
+		put: #( 'bbb' 'ccc' ).
+	self tell: there.
+	lines := (self loggedSince: mark) select: [ :each |
+		         each includesSubstring: 'databases.open' ].
+	self assert: lines size equals: 1.
+	self assert: (lines first includesSubstring: '+''ccc''').
+	self assert: (lines first includesSubstring: '-''aaa''').
+	self deny: (lines first includesSubstring: 'bbb')
+]
