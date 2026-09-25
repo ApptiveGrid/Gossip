@@ -61,6 +61,24 @@ GossipEndpointState >> applicationStatesAfterVersion: anInteger [
 ]
 
 { #category : 'accessing' }
+GossipEndpointState >> catchUpVersionTo: anInteger [
+	"Raise the counter this image reports for the endpoint to what it has actually
+	seen of it.
+
+	For the endpoint's own image the counter is a source: #nextVersion hands numbers
+	out, to #increaseHeartbeat and to GossipApplicationState>>setValue:endpointState:
+	alike, so one counter covers both kinds. For every other image holding a copy it
+	is a *mirror*, and it only stays one if arriving state moves it along - a copy
+	whose counter stands still tells the next asker there is nothing newer, and the
+	delta it would have got is never requested.
+
+	Never lowers it. Deltas arrive out of order and an older one must not undo what a
+	newer one already said."
+
+	maxVersion := maxVersion max: anInteger
+]
+
+{ #category : 'accessing' }
 GossipEndpointState >> endpoint [
 	^ endpoint
 ]
