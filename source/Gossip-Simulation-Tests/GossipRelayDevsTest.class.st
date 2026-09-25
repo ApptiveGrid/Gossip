@@ -122,13 +122,17 @@ GossipRelayDevsTest >> testARelayedHeartbeatKeepsCounting [
 
 	Measured on this very setup with the old #applyChangesTo: in place: A at 16, C
 	stuck at 9, and the gap grows with every further round. Hence keeping up rather
-	than merely moving - a gap of one is the relay hop."
+	than merely moving.
+
+	The bound is three because the gap is measured, not guessed: over 300 runs it was
+	zero or one every time but twice, where it was two. What it has to stay clear of
+	is the seven that a standing counter produced, and that only grows."
 
 	self gossipRounds: 12.
 	self assert: (self knownVersionOfAAt: gossC) notNil.
 	self
 		assert: gossA localEndpointState heartbeatState version
-			- (self knownVersionOfAAt: gossC) <= 1
+			- (self knownVersionOfAAt: gossC) <= 3
 ]
 
 { #category : 'tests' }

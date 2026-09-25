@@ -108,7 +108,7 @@ Gossiper >> gossip [
 Gossiper >> initialize [ 
 	super initialize.
 	running := false.
-	generation := (Time microsecondClockValue / 1000) rounded .
+	generation := self newGeneration
 ]
 
 { #category : 'accessing' }
@@ -118,14 +118,14 @@ Gossiper >> localEndpoint [
 
 { #category : 'accessing' }
 Gossiper >> localEndpointState [
-	^ self endpoints 
-		endpointStateAt: self localEndpoint
-		ifAbsentPut: [ 
-			Transcript show: 'initializing ', self localEndpoint printString, ' with generation ', generation printString; cr.
-			GossipEndpointState new
-				endpoint: self localEndpoint;
-				generation: generation;
-				yourself  ]
+	^ self endpoints
+		  endpointStateAt: self localEndpoint
+		  ifAbsentPut: [
+			  self log: 'this incarnation is generation ' , generation printString.
+			  GossipEndpointState new
+				  endpoint: self localEndpoint;
+				  generation: generation;
+				  yourself ]
 ]
 
 { #category : 'private' }
@@ -139,6 +139,18 @@ Gossiper >> log: aString [
 	gossipers can run in one image, and in the tests here they do."
 
 	GossipSignal emit: self localEndpoint asString , ': ' , aString
+]
+
+{ #category : 'gossiping' }
+Gossiper >> newGeneration [
+	"A number for this incarnation: higher than the one before it, and ordering
+	sensibly against what other images draw. The wall clock in milliseconds does
+	both. It is raised past the previous one where it has to be, because two
+	incarnations can fall in the same millisecond - not in a deployment, easily in a
+	simulation."
+
+	^ (Time microsecondClockValue / 1000) rounded
+	  max: (generation ifNil: [ 0 ]) + 1
 ]
 
 { #category : 'instance creation' }
@@ -229,6 +241,26 @@ Gossiper >> removeFromList: aKey item: anItem [
 	list := holder value ifNil: [ GossipListValue new ].
 	list remove: anItem.
 	self localEndpointState applicationStateAt: aKey put: list
+]
+
+{ #category : 'gossiping' }
+Gossiper >> restart [
+	"What a restart does to a gossiper, without a process being restarted: whatever
+	it had learned is gone, and it comes back under the same endpoint as a new
+	incarnation.
+
+	That is all a restart is as far as the protocol is concerned. The others
+	recognise the higher generation and replace what they held rather than merging
+	it - GossipEndpointState>>processDigest:forMessage: asks for a complete refresh,
+	GossipEndpoints>>apply:to: does the replacing.
+
+	The socket is not touched: whether this gossiper runs and where it listens is the
+	caller's business, and in a simulation there is no socket at all. Which is the
+	point of having this - a gossiper wired into a model cannot be swapped for a
+	fresh one the way a test holding two objects can."
+
+	endpoints := nil.
+	generation := self newGeneration
 ]
 
 { #category : 'accessing' }
