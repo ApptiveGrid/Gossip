@@ -26,11 +26,15 @@ GossipEndpointStateDelta >> applicationStates: aCollection [
 	applicationStates := aCollection
 ]
 
-{ #category : 'as yet unclassified' }
-GossipEndpointStateDelta >> applyChangesTo: endpointState [ 
+{ #category : 'applying' }
+GossipEndpointStateDelta >> applyChangesTo: endpointState [
+
 	endpointState heartbeatState updateFrom: heartbeatState.
 	applicationStates keysAndValuesDo: [ :key :value |
-		endpointState applicationStateAt: key overwrite: value ]
+		endpointState applicationStateAt: key overwrite: value ].
+	"The counter has to follow the content, or the copy lies about itself in the next
+	digest - see GossipEndpointState>>catchUpVersionTo:."
+	endpointState catchUpVersionTo: self highestVersion
 ]
 
 { #category : 'accessing' }
@@ -51,6 +55,23 @@ GossipEndpointStateDelta >> heartbeatState [
 { #category : 'accessing' }
 GossipEndpointStateDelta >> heartbeatState: aGossipHeartbeatState [ 
 	heartbeatState := aGossipHeartbeatState
+]
+
+{ #category : 'accessing' }
+GossipEndpointStateDelta >> highestVersion [
+	"How far this delta carries the endpoint's counter. Heartbeat and application
+	states are numbered from the same counter, so the highest of either kind is the
+	highest there is.
+
+	Answers 0 for a delta that carries nothing numbered, which raises no counter."
+
+	| highest |
+	highest := heartbeatState
+		           ifNil: [ 0 ]
+		           ifNotNil: [ :each | each version ifNil: [ 0 ] ].
+	applicationStates do: [ :each |
+		each version ifNotNil: [ :version | highest := highest max: version ] ].
+	^ highest
 ]
 
 { #category : 'initialization' }
